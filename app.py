@@ -60,7 +60,7 @@ def habitacionVista(id_habitacion):
 
 @app.route('/reserva', methods=["GET", "POST"])
 def reserva():
-    return render_template('rserva.html')
+    return render_template('reserva.html')
 
 
 @app.route('/pago', methods=["GET", "POST"])
