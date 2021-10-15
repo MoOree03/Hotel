@@ -47,6 +47,10 @@ def Reserva():
 def Comentarios():
     return render_template('Comentarios.html')
 
+@app.route('/Calificacion', methods=["GET","POST"])
+def Calificacion():
+    return render_template('Calificacion.html')
+
 
 @app.route('/Herramientas', methods=["GET"])
 def Herramienta():
