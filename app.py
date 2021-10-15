@@ -5,67 +5,72 @@ from flask import request
 
 app = Flask(__name__)
 
-lista_habitaciones = ["a", "b"]
-
-
-ingreso = False
-
 
 @app.route('/', methods=["GET"])
 def inicio():
     # Si inicio sesion -> Mostrar bienvenida, y cambio de navbar
     # Sino -> mantener rol de visitante
-    return render_template('index.html', ingreso=ingreso)
+    return render_template('index.html')
 
 
-@app.route('/iniciarSesion', methods=["GET", "POST"])
-def ingreso():
-    global ingreso
-    if request.method == "GET":
-        return render_template('iniciarSesion.html')
-    else:
-        ingreso = True
-        return redirect("/")
+@app.route('/IniciarSesion', methods=["GET", "POST"])
+def IniciarSesion():
+    # Validar si es admin o usuario
+    return render_template('IniciarSesion.html')
 
 
-@app.route('/salida', methods=["POST"])
-def salida():
-    global ingreso
-    ingreso = False
-    return redirect("/")
+@app.route('/Registro', methods=["GET", "POST"])
+def Registro():
+    # validar espacios
+    return render_template('Registro.html')
 
 
-@app.route('/registro', methods=["GET", "POST"])
-def registro():
-    return render_template('registro.html')
+@app.route('/Recuperar', methods=["GET", "POST"])
+def Recuperar():
+    # validar que este registrado -> enviar correo
+    return render_template('Recuperar.html')
 
 
-@app.route('/recuperar', methods=["GET", "POST"])
-def recuperar():
-    return render_template('recuperar.html')
+@app.route('/Habitacion', methods=["GET"])
+def Habitacion():
+    # Crear un buscador para filtrar habitaciones por nombre
+    return render_template('Habitacion.html')
 
 
-@app.route('/habitaciones', methods=["GET", "POST"])
-def habitaciones():
-    # Crear un input para insertar numero de habitacion y validar
-    return render_template('habitaciones.html')
+@app.route('/Reserva', methods=["GET", "POST"])
+def Reserva():
+    # Validad datos y registrar
+    return render_template('Reserva.html')
 
 
-
-@app.route('/habitacion/<id_habitacion>', methods=["GET"])
-def habitacionVista(id_habitacion):
-    return f"La habitacion /habitacion{id_habitacion}.html"
-
+@app.route('/Comentarios', methods=["GET"])
+def Comentarios():
+    return render_template('Comentarios.html')
 
 
-@app.route('/reserva', methods=["GET", "POST"])
-def reserva():
-    return render_template('reserva.html')
+@app.route('/Herramientas', methods=["GET"])
+def Herramienta():
+    return render_template('Herramientas.html')
 
 
-@app.route('/pago', methods=["GET", "POST"])
-def pago():
-    return render_template('pago.html')
+@app.route('/GestionComentarios', methods=["GET", "POST"])
+def GestionComentarios():
+    return render_template('GestionComentarios.html')
+
+
+@app.route('/Editar', methods=["GET", "POST"])
+def Editar():
+    return render_template('Editar.html')
+
+
+@app.route('/Agregar', methods=["GET", "POST"])
+def Agregar():
+    return render_template('Agregar.html')
+
+
+@app.route('/Eliminar', methods=["GET", "POST"])
+def Eliminar():
+    return render_template('Eliminar.html')
 
 
 if __name__ == '__main__':
