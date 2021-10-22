@@ -35,8 +35,8 @@
 <body class="u-body">
   <header class="u-clearfix u-header u-header" id="sec-b77b">
     <div class="u-clearfix u-sheet u-sheet-1">
-      <a href="/" data-page-id="835051" class="u-image u-logo u-image-1" data-image-width="512"
-        data-image-height="512" title="Inicio">
+      <a href="/" data-page-id="835051" class="u-image u-logo u-image-1" data-image-width="512" data-image-height="512"
+        title="Inicio">
         <img src="/static/img/hotel.png" class="u-logo-image u-logo-image-1">
       </a>
       <nav class="u-menu u-menu-dropdown u-offcanvas u-menu-1">
@@ -109,18 +109,18 @@
         <div class="u-container-layout u-container-layout-1">
           <h3 class="u-text u-text-default u-text-1">Crear una cuenta</h3>
           <div class="u-form u-form-1">
-            <form action="#" method="POST" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
-              source="custom" name="form" style="padding: 10px;">
+            <form name="formulario" method='post' action="{{url_for('Registro')}}"
+              class=" u-clearfix u-form-spacing-10 u-form-vertical u-inner-form"
+              style="padding: 10px;">
               <div class="u-form-group">
-                <label for="name-b0d0" class="u-form-control-hidden u-label"></label>
-                <input type="text" placeholder="Nombre" id="name-b0d0" name="reg_name"
+                <label for="nombre" class="u-label"></label>
+                <input type="text" placeholder="Nombre sin espacios" id="nombre" name="nombre"
                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
               </div>
               <div class="u-form-group u-form-partition-factor-2 u-form-select u-form-group-2">
-                <label for="select-300c" class="u-label">Tipo de documento</label>
+                <label for="tipo" class="u-label">Tipo de documento</label>
                 <div class="u-form-select-wrapper">
-                  <select id="select-300c" name="select"
-                    class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                  <select id="tipo" name="tipo" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
                     <option value="Cedula de ciudadanía">Cedula de ciudadanía</option>
                     <option value="Pasaporte">Pasaporte</option>
                     <option value="Cedula de extranjería">Cedula de extranjería</option>
@@ -131,10 +131,9 @@
                 </div>
               </div>
               <div class="u-form-group u-form-partition-factor-2 u-form-select u-form-group-3">
-                <label for="select-e2ef" class="u-label">Pais</label>
+                <label for="pais" class="u-label">Pais</label>
                 <div class="u-form-select-wrapper">
-                  <select id="select-e2ef" name="Pais"
-                    class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                  <select id="pais" name="pais" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
                     <option value="Colombia">Colombia</option>
                     <option value="Argentina">Argentina</option>
                     <option value="Chile">Chile</option>
@@ -150,45 +149,37 @@
                 </div>
               </div>
               <div class="u-form-group u-form-name">
-                <label for="numero-b0d0" class="u-form-control-hidden u-label"></label>
-                <input type="text" placeholder="Número de documento" id="numero-b0d0" name="res_numero"
+                <label for="numero" class="u-label"></label>
+                <input type="text" placeholder="Número de documento" id="numero" name="numero"
                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
               </div>
               <div class="u-form-group">
-                <label for="email-b0d0" class="u-form-control-hidden u-label"></label>
-                <input type="text" placeholder="Email" id="email-b0d0" name="reg_email"
+                <label for="email" class="u-label"></label>
+                <input type="text" placeholder="Email" id="email" name="email"
                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
               </div>
               <div class="u-form-group u-form-group-3">
-                <label for="text-83b9" class="u-form-control-hidden u-label"></label>
-                <input type="text" placeholder="Contraseña" id="text-83b9" name="reg_pass"
+                <label for="contrasena" class="u-label"></label>
+                <input type="password" placeholder="Contraseña, use simbolos y numeros" id="contrasena" name="contrasena"
                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
               </div>
               <div class="u-form-group u-form-group-4">
-                <label for="text-dc9b" class="u-form-control-hidden u-label"></label>
-                <input type="text" placeholder="Confirmar contraseña" id="text-dc9b" name="reg_confirm"
+                <label for="confirma" class="u-label"></label>
+                <input type="password" placeholder="Confirmar contraseña" id="confirma" name="confirma"
                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
               </div>
               <div class="u-form-group u-form-group-5">
-                <label for="phone-cbf2" class="u-form-control-hidden u-label"></label>
-                <input type="text"
-                  pattern="\+?\d{0,3}[\s\(\-]?([0-9]{2,3})[\s\)\-]?([\s\-]?)([0-9]{3})[\s\-]?([0-9]{2})[\s\-]?([0-9]{2})"
-                  placeholder="Ingrese su teléfono (por ejemplo, +14155552675)" id="phone-cbf2" name="reg_phone"
-                  class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                <label for="telefono" class="u-label"></label>
+                <input type="text" placeholder="Ingrese su teléfono (por ejemplo, +578144914571)" id="telefono"
+                  name="telefono" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
               </div>
               <div class="u-form-agree u-form-group u-form-group-6">
-                <input type="checkbox" id="agree-8f07" name="reg_agree" class="u-agree-checkbox">
-                <label for="agree-8f07" class="u-label">Acepto los términos y condiciones</label>
+                <input type="checkbox" id="terminos" name="terminos" class="u-agree-checkbox">
+                <label for="terminos" class="u-label">Acepto los términos y condiciones</label>
               </div>
               <div class="u-align-left u-form-group u-form-submit">
-                <a href="#" class="u-btn u-btn-submit u-button-style">Registrarme<br>
-                </a>
-                <input type="submit" value="submit" class="u-form-control-hidden">
+                <input type="submit" value="Registrarme" class="u-btn u-btn-submit u-button-style">
               </div>
-              <div class="u-form-send-message u-form-send-success"> Gracias! Tu mensaje ha sido enviado. </div>
-              <div class="u-form-send-error u-form-send-message"> No se puede enviar su mensaje. Por favor, corrija los
-                errores y vuelva a intentarlo. </div>
-              <input type="hidden" value="" name="recaptchaResponse">
             </form>
           </div>
         </div>
