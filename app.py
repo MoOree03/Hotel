@@ -1,5 +1,6 @@
 import re
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for,session,\
+    make_response,g
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import utils
@@ -8,20 +9,80 @@ import functools
 
 app = Flask(__name__)
 app.secret_key = os.urandom(12)
-
+inicioS = False
 
 @app.route('/', methods=['GET'])
 def inicio():
     # Si inicio sesion -> Mostrar bienvenida, y cambio de navbar
     # Sino -> mantener rol de visitante
-    return render_template('index.html')
+    return render_template('index.html',inicioS=inicioS)
 
 
 @app.route('/iniciar', methods=['POST', 'GET'])
 def iniciar():
-    # Validar si es admin o usuario
-    return render_template('iniciar.html')
+    global inicioS
+    try:
+        if request.method == 'POST':
+            username = request.form['usuario']
+            password = request.form['password']
+            
+            db = get_db()
+            error = None
 
+            if not username:
+                error = 'Debes ingresar un usuario'
+                flash(error)
+                return render_template('iniciar.html')
+
+            if not password:
+                error = 'Debes ingresar una contraseña'
+                flash(error)
+                return render_template('iniciar.html')
+
+            user = db.execute('SELECT * FROM usuarios WHERE Nombre= ?', (username, )).fetchone()
+
+            if user is None:
+                error = 'Usuario o contraseña inválidos'
+                return render_template('iniciar.html')
+            else:
+                store_password = user[6]
+                result = check_password_hash(store_password, password)
+                if result is False:
+                    error = 'Usuario o contraseña inválidos'
+                    return render_template('iniciar.html')
+                else:
+                    session.clear()
+                    inicioS = False
+                    session['user_id'] = user[0]
+            inicioS = True
+        return render_template('iniciar.html',inicioS=inicioS)
+    except Exception as ex:
+        print(ex)
+        return render_template('iniciar.html')
+
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for('iniciar'))
+        return view(**kwargs)
+    return wrapped_view
+
+@app.route('/salir')
+def salir():
+    global inicioS
+    inicioS = False
+    session.clear()
+    return redirect(url_for('inicio'))
+
+@app.before_request
+def load_logged_in_user():
+    user_id = session.get('user_id')
+    if user_id is None:
+        g.user = None
+    else:
+        db = get_db()
+        g.user = db.execute('SELECT * FROM usuarios WHERE id = ?', (user_id, )).fetchone()
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
@@ -121,23 +182,24 @@ def recuperar():
 @app.route('/habitacion', methods=['GET'])
 def habitacion():
     # Crear un buscador para filtrar habitaciones por nombre
-    return render_template('habitacion.html')
+    return render_template('habitacion.html',inicioS=inicioS)
 
 
 @app.route('/reserva', methods=['POST', 'GET'])
+@login_required
 def reserva():
     # Validad datos y registrar
-    return render_template('reserva.html')
+    return render_template('reserva.html',inicioS=inicioS)
 
 
 @app.route('/comentarios', methods=['GET'])
 def comentarios():
-    return render_template('comentarios.html')
+    return render_template('comentarios.html',inicioS=inicioS)
 
 
 @app.route('/calificacion', methods=['POST', 'GET'])
 def calificacion():
-    return render_template('calificacion.html')
+    return render_template('calificacion.html',inicioS=inicioS)
 
 
 @app.route('/herramientas', methods=['GET'])

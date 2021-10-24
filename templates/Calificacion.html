@@ -59,22 +59,28 @@
         </div>
         <div class="u-custom-menu u-nav-container">
           <ul class="u-nav u-spacing-2 u-unstyled u-nav-1">
-            <li class="u-nav-item"><a
-                class="u-active-grey-5 u-button-style u-hover-grey-10 u-nav-link u-text-active-grey-90 u-text-grey-90 u-text-hover-grey-90"
-                href="/" style="padding: 10px 20px;">Inicio</a>
+            {% if inicioS %}
+            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="/" style="padding: 10px 20px;">Inicio</a>
             </li>
-            <li class="u-nav-item"><a
-                class="u-active-grey-5 u-button-style u-hover-grey-10 u-nav-link u-text-active-grey-90 u-text-grey-90 u-text-hover-grey-90"
-                href="reserva" style="padding: 10px 20px;">Reserva</a>
+            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="reserva"
+                style="padding: 10px 20px;">Reserva</a>
             </li>
-            <li class="u-nav-item"><a
-                class="u-active-grey-5 u-button-style u-hover-grey-10 u-nav-link u-text-active-grey-90 u-text-grey-90 u-text-hover-grey-90"
-                href="registro" style="padding: 10px 20px;">Crea una cuenta</a>
+            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="salir" style="padding: 10px 20px;">Cerrar
+                Sesion</a>
             </li>
-            <li class="u-nav-item"><a
-                class="u-active-grey-5 u-button-style u-hover-grey-10 u-nav-link u-text-active-grey-90 u-text-grey-90 u-text-hover-grey-90"
-                href="iniciar" style="padding: 10px 20px;">Iniciar sesión</a>
+            {% else %}
+            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="/" style="padding: 10px 20px;">Inicio</a>
             </li>
+            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="reserva"
+                style="padding: 10px 20px;">Reserva</a>
+            </li>
+            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="registro"
+                style="padding: 10px 20px;">Crear una cuenta</a>
+            </li>
+            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="iniciar"
+                style="padding: 10px 20px;">Iniciar sesión</a>
+            </li>
+            {% endif %}
           </ul>
         </div>
         <div class="u-custom-menu u-nav-container-collapse">
@@ -82,6 +88,17 @@
             <div class="u-inner-container-layout u-sidenav-overflow">
               <div class="u-menu-close"></div>
               <ul class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-2">
+                {% if inicioS %}
+                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="/"
+                    style="padding: 10px 20px;">Inicio</a>
+                </li>
+                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="reserva"
+                    style="padding: 10px 20px;">Reserva</a>
+                </li>
+                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="salir"
+                    style="padding: 10px 20px;">Cerrar Sesion</a>
+                </li>
+                {% else %}
                 <li class="u-nav-item"><a class="u-button-style u-nav-link" href="/"
                     style="padding: 10px 20px;">Inicio</a>
                 </li>
@@ -89,11 +106,12 @@
                     style="padding: 10px 20px;">Reserva</a>
                 </li>
                 <li class="u-nav-item"><a class="u-button-style u-nav-link" href="registro"
-                    style="padding: 10px 20px;">Crea una cuenta</a>
+                    style="padding: 10px 20px;">Crear una cuenta</a>
                 </li>
                 <li class="u-nav-item"><a class="u-button-style u-nav-link" href="iniciar"
                     style="padding: 10px 20px;">Iniciar sesión</a>
                 </li>
+                {% endif %}
               </ul>
             </div>
           </div>
@@ -113,8 +131,8 @@
           <h5 class="u-text u-text-4">Precio-Calidad</h5>
           <h5 class="u-text u-text-5">Experiencia</h5>
           <div class="u-align-center u-form u-form-1">
-            <form action="#" method="POST" class="u-clearfix u-form-spacing-10 u-inner-form"
-              source="custom" name="form" style="padding: 10px;">
+            <form action="#" method="POST" class="u-clearfix u-form-spacing-10 u-inner-form" source="custom" name="form"
+              style="padding: 10px;">
               <div class="u-form-group u-form-partition-factor-4 u-form-radiobutton u-form-group-1">
                 <div class="u-form-radio-button-wrapper">
                   <input type="radio" name="ca_limp" value="1">
