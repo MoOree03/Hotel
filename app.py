@@ -1,6 +1,6 @@
 import re
-from flask import Flask, render_template, request, flash, redirect, url_for,session,\
-    make_response,g
+from flask import Flask, render_template, request, flash, redirect, url_for, session,\
+    make_response, g
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import utils
@@ -11,11 +11,12 @@ app = Flask(__name__)
 app.secret_key = os.urandom(12)
 inicioS = False
 
+
 @app.route('/', methods=['GET'])
 def inicio():
     # Si inicio sesion -> Mostrar bienvenida, y cambio de navbar
     # Sino -> mantener rol de visitante
-    return render_template('index.html',inicioS=inicioS)
+    return render_template('index.html', inicioS=inicioS)
 
 
 @app.route('/iniciar', methods=['POST', 'GET'])
@@ -25,7 +26,7 @@ def iniciar():
         if request.method == 'POST':
             username = request.form['usuario']
             password = request.form['password']
-            
+
             db = get_db()
             error = None
 
@@ -39,7 +40,8 @@ def iniciar():
                 flash(error)
                 return render_template('iniciar.html')
 
-            user = db.execute('SELECT * FROM usuarios WHERE Nombre= ?', (username, )).fetchone()
+            user = db.execute(
+                'SELECT * FROM usuarios WHERE Nombre= ?', (username, )).fetchone()
 
             if user is None:
                 error = 'Usuario o contraseña inválidos'
@@ -55,10 +57,12 @@ def iniciar():
                     inicioS = False
                     session['user_id'] = user[0]
             inicioS = True
-        return render_template('iniciar.html',inicioS=inicioS)
+            return render_template('reserva.html')
+        return render_template('iniciar.html', inicioS=inicioS)
     except Exception as ex:
         print(ex)
         return render_template('iniciar.html')
+
 
 def login_required(view):
     @functools.wraps(view)
@@ -68,12 +72,14 @@ def login_required(view):
         return view(**kwargs)
     return wrapped_view
 
+
 @app.route('/salir')
 def salir():
     global inicioS
     inicioS = False
     session.clear()
     return redirect(url_for('inicio'))
+
 
 @app.before_request
 def load_logged_in_user():
@@ -82,7 +88,9 @@ def load_logged_in_user():
         g.user = None
     else:
         db = get_db()
-        g.user = db.execute('SELECT * FROM usuarios WHERE id = ?', (user_id, )).fetchone()
+        g.user = db.execute(
+            'SELECT * FROM usuarios WHERE id = ?', (user_id, )).fetchone()
+
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
@@ -101,22 +109,22 @@ def registro():
             if not utils.isUsernameValid(nombre):
                 error = "El usuario no es valido"
                 flash(error)
-                return render_template('Registro.html')
+                return render_template('registro.html')
 
             if not utils.isNumberValid(numero):
                 error = "El número de documento no es valido"
                 flash(error)
-                return render_template("Registro.html")
+                return render_template("registro.html")
 
             if not utils.isEmailValid(email):
                 error = "El email no es valido"
                 flash(error)
-                return render_template('Registro.html')
+                return render_template('registro.html')
 
             if not utils.isPasswordValid(password):
                 error = "La contraseña no es valida"
                 flash(error)
-                return render_template('Registro.html')
+                return render_template('registro.html')
 
             if not utils.isPasswordValid(confirma):
                 error = "La confirmación no es valida"
@@ -124,19 +132,19 @@ def registro():
                     error = "La contraseña debe coincidir con la confirmación"
                     print(error)
                 flash(error)
-                return render_template('Registro.html')
+                return render_template('registro.html')
 
             if not utils.isPhoneValid(telefono):
                 error = "El número de telefono no es valido"
                 flash(error)
-                return render_template("Registro.html")
+                return render_template("registro.html")
 
             try:
                 terminos = request.form['terminos']
             except Exception as e:
                 e = "Debe aceptar los terminos y condiciones antes de avanzar"
                 flash(e)
-                return render_template("Registro.html")
+                return render_template("registro.html")
 
             db = get_db()
 
@@ -149,13 +157,13 @@ def registro():
                 error = 'El usuario ya existe'.format(nombre)
                 flash(error)
 
-                return render_template('Registro.html')
+                return render_template('registro.html')
 
             if demail is not None:
                 error = 'El usuario ya existe'.format(email)
                 flash(error)
 
-                return render_template('Registro.html')
+                return render_template('registro.html')
 
             try:
                 db.execute('INSERT INTO usuarios (Nombre,Tipo_Documento,Numero,Pais,Email,Contraseña,Telefono) VALUES (?,?,?,?,?,?,?)',
@@ -182,24 +190,78 @@ def recuperar():
 @app.route('/habitacion', methods=['GET'])
 def habitacion():
     # Crear un buscador para filtrar habitaciones por nombre
-    return render_template('habitacion.html',inicioS=inicioS)
+    return render_template('habitacion.html', inicioS=inicioS)
 
 
 @app.route('/reserva', methods=['POST', 'GET'])
 @login_required
 def reserva():
-    # Validad datos y registrar
-    return render_template('reserva.html',inicioS=inicioS)
+    try:
+        if request.method == 'POST':
+            llegada = request.form['llegada']
+            salida = request.form['salida']
+            habitacion = request.form['habi']
+            numero = request.form['numero']
+
+            error = None
+
+            if not utils.isDateValid(llegada):
+                error = "La fecha de llegada no es valida"
+                flash(error)
+                return render_template('reserva.html')
+
+            if not utils.isDateValid(salida):
+                error = "La fecha de salida no es valida"
+                flash(error)
+                return render_template('reserva.html')
+            
+            try:
+                terminos = request.form['terminos']
+            except Exception as e:
+                e = "Debe aceptar los terminos y condiciones antes de avanzar"
+                flash(e)
+                return render_template("reserva.html")
+
+            db = get_db()
+
+            disponibilidad = db.execute(
+                'SELECT estado FROM habitaciones WHERE habitacion=?', (habitacion,)).fetchone()
+            habita = db.execute(
+                'SELECT Habitacion FROM Habitaciones WHERE Habitacion=?', (habitacion,)).fetchone()
+            print(disponibilidad)
+            print(habitacion)
+            print(habita)
+            if disponibilidad == ('Ocupada',):
+                error = 'Habitación ocupada, seleccione otra'.format(disponibilidad)
+                flash(error)
+                return render_template('reserva.html')
+
+            try:
+                db.execute('INSERT INTO Reservas (Llegada,Salida,id_Habitacion,NumeroPersonas) VALUES (?,?,?,?)',
+                           (llegada, salida, habitacion, numero))
+                db.execute('UPDATE habitaciones SET estado = "Ocupada" WHERE habitaciones.habitacion =?',(habita))
+                db.commit()
+                db.close()
+                print("Guarda")
+            except Exception as e:
+                flash(e)
+                print(e)
+            return render_template('reserva.html',inicioS=inicioS)
+
+        return render_template('reserva.html')
+    except Exception as e:
+        print(e)
+        return render_template('reserva.html')
 
 
 @app.route('/comentarios', methods=['GET'])
 def comentarios():
-    return render_template('comentarios.html',inicioS=inicioS)
+    return render_template('comentarios.html')
 
 
 @app.route('/calificacion', methods=['POST', 'GET'])
 def calificacion():
-    return render_template('calificacion.html',inicioS=inicioS)
+    return render_template('calificacion.html', inicioS=inicioS)
 
 
 @app.route('/herramientas', methods=['GET'])

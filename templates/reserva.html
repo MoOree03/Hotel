@@ -11,6 +11,8 @@
   <link rel="icon" type="image/png" href="/static/img/hotel.png" />
   <link rel="stylesheet" href="/static/css/nicepage.css" media="screen">
   <link rel="stylesheet" href="/static/css/Reserva.css" media="screen">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
   <script class="u-script" type="text/javascript" src="/static/js/jquery.js" defer=""></script>
   <script class="u-script" type="text/javascript" src="/static/js/nicepage.js" defer=""></script>
   <meta name="generator" content="Nicepage 3.27.0, nicepage.com">
@@ -59,7 +61,6 @@
         </div>
         <div class="u-custom-menu u-nav-container">
           <ul class="u-nav u-spacing-2 u-unstyled u-nav-1">
-            {% if inicioS %}
             <li class="u-nav-item"><a class="u-button-style u-nav-link" href="/" style="padding: 10px 20px;">Inicio</a>
             </li>
             <li class="u-nav-item"><a class="u-button-style u-nav-link" href="reserva"
@@ -68,19 +69,6 @@
             <li class="u-nav-item"><a class="u-button-style u-nav-link" href="salir" style="padding: 10px 20px;">Cerrar
                 Sesion</a>
             </li>
-            {% else %}
-            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="/" style="padding: 10px 20px;">Inicio</a>
-            </li>
-            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="reserva"
-                style="padding: 10px 20px;">Reserva</a>
-            </li>
-            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="registro"
-                style="padding: 10px 20px;">Crear una cuenta</a>
-            </li>
-            <li class="u-nav-item"><a class="u-button-style u-nav-link" href="iniciar"
-                style="padding: 10px 20px;">Iniciar sesión</a>
-            </li>
-            {% endif %}
           </ul>
         </div>
         <div class="u-custom-menu u-nav-container-collapse">
@@ -88,7 +76,6 @@
             <div class="u-inner-container-layout u-sidenav-overflow">
               <div class="u-menu-close"></div>
               <ul class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-2">
-                {% if inicioS %}
                 <li class="u-nav-item"><a class="u-button-style u-nav-link" href="/"
                     style="padding: 10px 20px;">Inicio</a>
                 </li>
@@ -96,22 +83,9 @@
                     style="padding: 10px 20px;">Reserva</a>
                 </li>
                 <li class="u-nav-item"><a class="u-button-style u-nav-link" href="salir"
-                    style="padding: 10px 20px;">Cerrar Sesion</a>
+                    style="padding: 10px 20px;">Cerrar
+                    Sesion</a>
                 </li>
-                {% else %}
-                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="/"
-                    style="padding: 10px 20px;">Inicio</a>
-                </li>
-                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="reserva"
-                    style="padding: 10px 20px;">Reserva</a>
-                </li>
-                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="registro"
-                    style="padding: 10px 20px;">Crear una cuenta</a>
-                </li>
-                <li class="u-nav-item"><a class="u-button-style u-nav-link" href="iniciar"
-                    style="padding: 10px 20px;">Iniciar sesión</a>
-                </li>
-                {% endif %}
               </ul>
             </div>
           </div>
@@ -122,33 +96,40 @@
     </div>
   </header>
   <section class="u-align-center u-clearfix u-grey-10 u-section-1" id="sec-806e">
+    {% with messages = get_flashed_messages() %}
+  {% if messages %}
+
+  {%for message in messages %}
+  <div class="alert alert-danger ">{{message}}</div>
+  {% endfor%}
+  </ul>
+  {% endif %}
+  {% endwith %}
     <div class="u-clearfix u-sheet u-sheet-1">
       <div class="u-align-center u-container-style u-group u-radius-50 u-shape-round u-white u-group-1">
         <div class="u-container-layout u-container-layout-1">
           <h3 class="u-text u-text-default u-text-1">¡Reserva tu habitación!</h3>
           <div class="u-form u-form-1">
-            <form action="#" method="POST" class="u-clearfix u-form-spacing-10  u-inner-form" source="custom"
+            <form action="{{url_for('reserva')}}" method="POST" class="u-clearfix u-form-spacing-10  u-inner-form" source="custom"
               name="form" style="padding: 20px;">
               <div class="u-form-group u-form-group-6">
-                <label for="date-269c" class="u-label">Llegada</label>
-                <input type="text" placeholder="MM/DD/YYYY" id="date-269c" name="date_llegada"
+                <label for="llegada" class="u-label">Llegada</label>
+                <input type="text" placeholder="DD/MM/YYYY" id="llegada" name="llegada"
                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
               </div>
               <div class="u-form-group u-form-group-7">
-                <label for="date-3937" class="u-label">Salida</label>
-                <input type="text" placeholder="MM/DD/YYYY" id="date-3937" name="date_salida"
+                <label for="salida" class="u-label">Salida</label>
+                <input type="text" placeholder="DD/MM/YYYY" id="salida" name="salida"
                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
               </div>
               <div class="u-form-group u-form-partition-factor-2 u-form-select u-form-group-8">
-                <label for="select-903c" class="u-label">Habitación</label>
+                <label for="habi" class="u-label">Habitación</label>
                 <div class="u-form-select-wrapper">
-                  <select id="select-903c" name="res_hab"
-                    class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
-                    <option value="01">01</option>
-                    <option value="02">02</option>
-                    <option value="03">03</option>
-                    <option value="04">04</option>
-                    <option value="05">05</option>
+                  <select id="habi" name="habi" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
+                    <option value="001">001</option>
+                    <option value="002">002</option>
+                    <option value="003">003</option>
+                    <option value="004">004</option>
                   </select>
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="12" version="1" class="u-caret">
                     <path fill="currentColor" d="M4 8L0 4h8z"></path>
@@ -156,9 +137,9 @@
                 </div>
               </div>
               <div class="u-form-group u-form-partition-factor-2 u-form-select u-form-group-9">
-                <label for="select-b3b9" class="u-label">Número de personas</label>
-                <div class="u-form-select-wrapper">
-                  <select id="select-b3b9" name="res_num"
+                <label for="numero" class="u-label">Número de personas</label>
+                <div class="mb-3 u-form-select-wrapper">
+                  <select id="numero" name="numero"
                     class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
                     <option value="1">1</option>
                     <option value="2">2</option>
@@ -172,18 +153,12 @@
                 </div>
               </div>
               <div class="u-form-agree u-form-group u-form-group-10">
-                <input type="checkbox" id="agree-8f07" name="res_agree" class="u-agree-checkbox">
-                <label for="agree-8f07" class="u-label">Acepto los términos y condiciones</label>
+                <input type="checkbox" id="terminos" name="terminos" class="u-agree-checkbox">
+                <label for="terminos" class="u-label">Acepto los términos y condiciones</label>
               </div>
               <div class="u-align-left u-form-group u-form-submit">
-                <a href="#" class="u-btn u-btn-submit u-button-style">Reservar<br>
-                </a>
-                <input type="submit" value="submit" class="u-form-control-hidden">
+                <input type="submit" value="Registrarme" class="u-btn u-btn-submit u-button-style">
               </div>
-              <div class="u-form-send-message u-form-send-success"> Gracias! Tu mensaje ha sido enviado. </div>
-              <div class="u-form-send-error u-form-send-message"> No se puede enviar su mensaje. Por favor, corrija los
-                errores y vuelva a intentarlo. </div>
-              <input type="hidden" value="" name="recaptchaResponse">
             </form>
           </div>
         </div>
