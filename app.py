@@ -7,6 +7,7 @@ import utils
 from db import get_db
 import functools
 
+
 app = Flask(__name__)
 app.secret_key = os.urandom(12)
 inicioS = False
@@ -106,7 +107,7 @@ def registro():
             confirma = request.form['confirma']
             telefono = request.form['telefono']
             error = None
-
+            exito = False
             if not utils.isUsernameValid(nombre):
                 error = "El usuario no es valido"
                 flash(error)
@@ -171,7 +172,10 @@ def registro():
                            (nombre, tipo_documento, numero, pais, email, generate_password_hash(password), telefono))
                 db.commit()
                 db.close()
+
                 print("Guarda")
+                exito = True
+                render_template('registro.html')
             except Exception as e:
                 print(e)
             return redirect(url_for('iniciar'))
@@ -216,7 +220,7 @@ def reserva():
                 error = "La fecha de salida no es valida"
                 flash(error)
                 return render_template('reserva.html')
-            
+
             try:
                 terminos = request.form['terminos']
             except Exception as e:
@@ -234,22 +238,25 @@ def reserva():
             print(habitacion)
             print(habita)
             if disponibilidad == ('Ocupada',):
-                error = 'Habitación ocupada, seleccione otra'.format(disponibilidad)
+                error = 'Habitación ocupada, seleccione otra'.format(
+                    disponibilidad)
                 flash(error)
                 return render_template('reserva.html')
 
             try:
-                db.execute('INSERT INTO Reservas (Llegada,Salida,id_Habitacion,NumeroPersonas) VALUES (?,?,?,?)',
-                           (llegada, salida, habitacion, numero))
-                db.execute('UPDATE habitaciones SET estado = "Ocupada" WHERE habitaciones.habitacion =?',(habita))
+                db.execute('INSERT INTO Reservas (Llegada,Salida,id_Habitacion,NumeroPersonas,id_usuario) VALUES (?,?,?,?,?)',
+                           (llegada, salida, habitacion, numero, session.get('user_id')))
+                print(session.get('user_id'))         
+                db.execute(
+                    'UPDATE habitaciones SET estado = "Ocupada" WHERE habitaciones.habitacion =?', (habita))
                 db.commit()
                 db.close()
-                exito=True
+                exito = True
                 flash("La reserva se ha completado exitosamente")
             except Exception as e:
                 flash(e)
                 print(e)
-            return render_template('reserva.html',inicioS=inicioS,exito=exito)
+            return render_template('reserva.html', inicioS=inicioS, exito=exito)
 
         return render_template('reserva.html')
     except Exception as e:
@@ -257,14 +264,51 @@ def reserva():
         return render_template('reserva.html')
 
 
+@app.route('/calificacion', methods=['GET','POST'])
+@login_required
+def calificacion():
+    try:
+        if request.method == 'POST':
+            limpieza = request.form['limpieza']
+            atencion = request.form['atencion']
+            conectividad = request.form['conectividad']
+            servicio = request.form['habitacion']
+            comentario = request.form['comentario']
+            error = None
+            exito = False
+            print(limpieza+atencion+conectividad+servicio)
+            promedio = float((int(limpieza) + int(atencion) + int(conectividad) + int(servicio)))/4
+            print(promedio)
+            db = get_db()
+            id_user=session.get('user_id')
+            print(id_user)
+            try:
+                numero = db.execute(
+                'SELECT * FROM Reservas WHERE id_usuario= ?',(id_user,)).fetchone()
+                id_hab=numero[3]
+                print(numero)
+                print(type(numero))
+                db.execute('INSERT INTO Comentarios (Calificacion,Comentario,id_Usuario,id_Habitacion) VALUES (?,?,?,?)',
+                           (promedio, comentario, session.get('user_id'),id_hab))
+                db.commit()
+                db.close()
+                exito = True
+                flash("Gracias por comentar su experiencia!")
+            except Exception as e:
+                flash(e)
+                print(e)
+            return render_template('calificacion.html', inicioS=inicioS, exito=exito)
+        return render_template('calificacion.html', inicioS=inicioS)
+    except Exception as e:
+        print(e)
+        print("ahhhh")
+        return render_template('calificacion.html', inicioS=inicioS)
+
+
 @app.route('/comentarios', methods=['GET'])
 def comentarios():
-    return render_template('comentarios.html')
 
-
-@app.route('/calificacion', methods=['POST', 'GET'])
-def calificacion():
-    return render_template('calificacion.html', inicioS=inicioS)
+    return render_template('comentarios.html', inicioS=inicioS)
 
 
 @app.route('/herramientas', methods=['GET'])
