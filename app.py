@@ -42,9 +42,10 @@ def iniciar():
 
             user = db.execute(
                 'SELECT * FROM usuarios WHERE Nombre= ?', (username, )).fetchone()
-
+            print(user)
             if user is None:
                 error = 'Usuario o contraseña inválidos'
+                flash(error)
                 return render_template('iniciar.html')
             else:
                 store_password = user[6]
@@ -204,6 +205,7 @@ def reserva():
             numero = request.form['numero']
 
             error = None
+            exito = False
 
             if not utils.isDateValid(llegada):
                 error = "La fecha de llegada no es valida"
@@ -242,11 +244,12 @@ def reserva():
                 db.execute('UPDATE habitaciones SET estado = "Ocupada" WHERE habitaciones.habitacion =?',(habita))
                 db.commit()
                 db.close()
-                print("Guarda")
+                exito=True
+                flash("La reserva se ha completado exitosamente")
             except Exception as e:
                 flash(e)
                 print(e)
-            return render_template('reserva.html',inicioS=inicioS)
+            return render_template('reserva.html',inicioS=inicioS,exito=exito)
 
         return render_template('reserva.html')
     except Exception as e:
