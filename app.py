@@ -11,7 +11,7 @@ import functools
 app = Flask(__name__)
 app.secret_key = os.urandom(12)
 inicioS = False
-
+admin = False
 
 @app.route('/', methods=['GET'])
 def inicio():
@@ -23,6 +23,7 @@ def inicio():
 @app.route('/iniciar', methods=['POST', 'GET'])
 def iniciar():
     global inicioS
+    global admin
     try:
         if request.method == 'POST':
             username = request.form['usuario']
@@ -43,6 +44,11 @@ def iniciar():
 
             user = db.execute(
                 'SELECT * FROM usuarios WHERE Nombre= ?', (username, )).fetchone()
+            
+            adminL=user[8]
+            if adminL =='Admin':
+                admin=True
+                
             print(user)
             if user is None:
                 error = 'Usuario o contraseña inválidos'
@@ -74,11 +80,21 @@ def login_required(view):
         return view(**kwargs)
     return wrapped_view
 
+def admin_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None or admin == False:
+            return redirect(url_for('inicio'))
+        return view(**kwargs)
+    return wrapped_view
+
 
 @app.route('/salir')
 def salir():
     global inicioS
+    global admin
     inicioS = False
+    admin = False
     session.clear()
     return redirect(url_for('inicio'))
 
@@ -188,8 +204,33 @@ def registro():
 
 @app.route('/recuperar', methods=['POST', 'GET'])
 def recuperar():
-    # validar que este registrado -> enviar correo
-    return render_template('recuperar.html')
+        try:
+            if request.method == 'POST':
+                email = request.form['email']
+                error = None
+                exito = False
+
+                if not utils.isEmailValid(email):
+                    error = "El email no es valido"
+                    flash(error)
+                    return render_template('recuperar.html')
+
+                db = get_db()
+
+                validacion = db.execute(
+                    'SELECT Email FROM usuarios WHERE Email=?', (email,)).fetchone()
+                print(validacion)
+                if validacion is None:
+                    error = 'El usuario no existe'.format(email)
+                    flash(error)
+                    return render_template('recuperar.html')
+
+                exito = True
+                flash('Hemos enviado un mensaje a su correo')
+                return render_template('recuperar.html', inicioS=inicioS, exito=exito)
+            return render_template('recuperar.html',inicioS=inicioS)
+        except Exception as e:
+            return render_template('recuperar.html',inicioS=inicioS)
 
 
 @app.route('/habitacion', methods=['GET'])
@@ -234,19 +275,15 @@ def reserva():
                 'SELECT estado FROM habitaciones WHERE habitacion=?', (habitacion,)).fetchone()
             habita = db.execute(
                 'SELECT Habitacion FROM Habitaciones WHERE Habitacion=?', (habitacion,)).fetchone()
-            print(disponibilidad)
-            print(habitacion)
-            print(habita)
+
             if disponibilidad == ('Ocupada',):
                 error = 'Habitación ocupada, seleccione otra'.format(
                     disponibilidad)
                 flash(error)
                 return render_template('reserva.html')
-
             try:
                 db.execute('INSERT INTO Reservas (Llegada,Salida,id_Habitacion,NumeroPersonas,id_usuario) VALUES (?,?,?,?,?)',
-                           (llegada, salida, habitacion, numero, session.get('user_id')))
-                print(session.get('user_id'))         
+                           (llegada, salida, habitacion, numero, session.get('user_id')))        
                 db.execute(
                     'UPDATE habitaciones SET estado = "Ocupada" WHERE habitaciones.habitacion =?', (habita))
                 db.commit()
@@ -257,10 +294,8 @@ def reserva():
                 flash(e)
                 print(e)
             return render_template('reserva.html', inicioS=inicioS, exito=exito)
-
         return render_template('reserva.html')
     except Exception as e:
-        print(e)
         return render_template('reserva.html')
 
 
@@ -276,12 +311,9 @@ def calificacion():
             comentario = request.form['comentario']
             error = None
             exito = False
-            print(limpieza+atencion+conectividad+servicio)
             promedio = float((int(limpieza) + int(atencion) + int(conectividad) + int(servicio)))/4
-            print(promedio)
             db = get_db()
             id_user=session.get('user_id')
-            print(id_user)
             try:
                 numero = db.execute(
                 'SELECT * FROM Reservas WHERE id_usuario= ?',(id_user,)).fetchone()
@@ -301,37 +333,40 @@ def calificacion():
         return render_template('calificacion.html', inicioS=inicioS)
     except Exception as e:
         print(e)
-        print("ahhhh")
         return render_template('calificacion.html', inicioS=inicioS)
 
 
 @app.route('/comentarios', methods=['GET'])
 def comentarios():
-
     return render_template('comentarios.html', inicioS=inicioS)
 
 
 @app.route('/herramientas', methods=['GET'])
+@admin_required
 def herramienta():
     return render_template('herramientas.html')
 
 
 @app.route('/gestion', methods=['POST', 'GET'])
+@admin_required
 def gestion():
     return render_template('gestion.html')
 
 
 @app.route('/editar', methods=['POST', 'GET'])
+@admin_required
 def editar():
     return render_template('editar.html')
 
 
 @app.route('/agregar', methods=['POST', 'GET'])
+@admin_required
 def agregar():
     return render_template('agregar.html')
 
 
 @app.route('/eliminar', methods=['POST', 'GET'])
+@admin_required
 def eliminar():
     return render_template('eliminar.html')
 

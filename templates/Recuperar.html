@@ -12,6 +12,8 @@
   <link rel="icon" type="image/png" href="/static/img/hotel.png" />
   <link rel="stylesheet" href="/static/css/nicepage.css" media="screen">
   <link rel="stylesheet" href="/static/css/Recuperar.css" media="screen">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
   <script class="u-script" type="text/javascript" src="/static/js/jquery.js" defer=""></script>
   <script class="u-script" type="text/javascript" src="/static/js/nicepage.js" defer=""></script>
   <meta name="generator" content="Nicepage 3.27.0, nicepage.com">
@@ -123,16 +125,28 @@
     </div>
   </header>
   <section class="u-align-center u-clearfix u-grey-10 u-section-1" id="sec-806e">
+    {% with messages = get_flashed_messages() %}
+    {% if messages and not exito %}
+      {%for message in messages %}
+    <div class="alert alert-danger ">{{message}}</div>
+      {% endfor%}
+    {% endif %}
+    {% if messages and exito %}
+      {%for message in messages %}
+    <div class="alert alert-success ">{{message}}</div>
+      {% endfor%}
+    {% endif %}
+    {% endwith %}
     <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
       <div class="u-align-center u-container-style u-group u-radius-50 u-shape-round u-white u-group-1">
         <div class="u-container-layout u-container-layout-1">
           <h3 class="u-text u-text-default u-text-1">Recupera tu cuenta</h3>
           <div class="u-form u-form-1">
-            <form action="#" method="POST" class="u-clearfix u-form-spacing-10  u-inner-form" source="custom"
+            <form action="{{url_for('recuperar')}}" method="POST" class="u-clearfix u-form-spacing-10  u-inner-form" source="custom"
               name="form" style="padding: 10px;">
               <div class="u-form-group u-form-name">
-                <label for="name-b0d0" class="u-label">Correo electronico o nombre de usuario*</label>
-                <input type="text" id="name-b0d0" name="rec_email"
+                <label for="email" class="u-label">Correo electronico*</label>
+                <input type="text" id="email" name="email"
                   class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
               </div>
               <div class="u-align-left u-form-group u-form-submit">
@@ -140,10 +154,6 @@
                 </a>
                 <input type="submit" value="submit" class="u-form-control-hidden">
               </div>
-              <div class="u-form-send-message u-form-send-success"> Gracias! Tu mensaje ha sido enviado. </div>
-              <div class="u-form-send-error u-form-send-message"> No se puede enviar su mensaje. Por favor, corrija los
-                errores y vuelva a intentarlo. </div>
-              <input type="hidden" value="" name="recaptchaResponse">
             </form>
           </div>
         </div>
