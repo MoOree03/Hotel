@@ -98,14 +98,14 @@
   <section class="u-align-center u-clearfix u-grey-10 u-section-1" id="sec-806e">
     {% with messages = get_flashed_messages() %}
     {% if messages and not exito %}
-      {%for message in messages %}
+    {%for message in messages %}
     <div class="alert alert-danger ">{{message}}</div>
-      {% endfor%}
+    {% endfor%}
     {% endif %}
     {% if messages and exito %}
-      {%for message in messages %}
+    {%for message in messages %}
     <div class="alert alert-success ">{{message}}</div>
-      {% endfor%}
+    {% endfor%}
     {% endif %}
     {% endwith %}
     <div class="u-clearfix u-sheet u-sheet-1">
@@ -113,8 +113,8 @@
         <div class="u-container-layout u-container-layout-1">
           <h3 class="u-text u-text-default u-text-1">¡Reserva tu habitación!</h3>
           <div class="u-form u-form-1">
-            <form action="{{url_for('reserva')}}" method="POST" class="u-clearfix u-form-spacing-10  u-inner-form" source="custom"
-              name="form" style="padding: 20px;">
+            <form action="{{url_for('reserva')}}" method="POST" class="u-clearfix u-form-spacing-10  u-inner-form"
+              source="custom" name="form" style="padding: 20px;">
               <div class="u-form-group u-form-group-6">
                 <label for="llegada" class="u-label">Llegada</label>
                 <input type="text" placeholder="DD/MM/YYYY" id="llegada" name="llegada"

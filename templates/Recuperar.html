@@ -127,14 +127,14 @@
   <section class="u-align-center u-clearfix u-grey-10 u-section-1" id="sec-806e">
     {% with messages = get_flashed_messages() %}
     {% if messages and not exito %}
-      {%for message in messages %}
+    {%for message in messages %}
     <div class="alert alert-danger ">{{message}}</div>
-      {% endfor%}
+    {% endfor%}
     {% endif %}
     {% if messages and exito %}
-      {%for message in messages %}
+    {%for message in messages %}
     <div class="alert alert-success ">{{message}}</div>
-      {% endfor%}
+    {% endfor%}
     {% endif %}
     {% endwith %}
     <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
@@ -142,8 +142,8 @@
         <div class="u-container-layout u-container-layout-1">
           <h3 class="u-text u-text-default u-text-1">Recupera tu cuenta</h3>
           <div class="u-form u-form-1">
-            <form action="{{url_for('recuperar')}}" method="POST" class="u-clearfix u-form-spacing-10  u-inner-form" source="custom"
-              name="form" style="padding: 10px;">
+            <form action="{{url_for('recuperar')}}" method="POST" class="u-clearfix u-form-spacing-10  u-inner-form"
+              source="custom" name="form" style="padding: 10px;">
               <div class="u-form-group u-form-name">
                 <label for="email" class="u-label">Correo electronico*</label>
                 <input type="text" id="email" name="email"

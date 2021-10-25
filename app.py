@@ -65,7 +65,6 @@ def iniciar():
             if adminL == 'Admin':
                 admin = True
 
-            
             inicioS = True
             return render_template('reserva.html')
         return render_template('iniciar.html', inicioS=inicioS)
@@ -357,15 +356,18 @@ def gestion():
         if request.method == 'POST':
             try:
                 db = get_db()
-                comentarios = db.execute('SELECT Comentario FROM Comentarios').fetchall()
-                calificacion = db.execute('SELECT Calificacion FROM Comentarios').fetchall()
-                usuarios =db.execute('SELECT id_Usuario FROM Comentarios').fetchall()
+                comentarios = db.execute(
+                    'SELECT Comentario FROM Comentarios').fetchall()
+                calificacion = db.execute(
+                    'SELECT Calificacion FROM Comentarios').fetchall()
+                usuarios = db.execute(
+                    'SELECT id_Usuario FROM Comentarios').fetchall()
                 for i in comentarios:
-                    flash(i,category='warning')
+                    flash(i, category='warning')
                 for a in calificacion:
-                    flash(a,category='info')
+                    flash(a, category='info')
                 for b in usuarios:
-                    flash(b,category='error')
+                    flash(b, category='error')
             except Exception as e:
                 print(e)
             try:
@@ -377,10 +379,12 @@ def gestion():
             try:
                 eliminar = request.form['eliminar']
                 print(eliminar)
-                db.execute('DELETE FROM Comentarios WHERE id_Usuario = ?',(eliminar,))
+                db.execute(
+                    'DELETE FROM Comentarios WHERE id_Usuario = ?', (eliminar,))
                 db.commit()
                 db.close()
-                flash("El comentario fue eliminada exitosamente",category='success')
+                flash("El comentario fue eliminada exitosamente",
+                      category='success')
                 return render_template('gestion.html')
             except Exception as e:
                 print(e)
@@ -389,26 +393,25 @@ def gestion():
         print(e)
         return render_template('gestion.html')
     return render_template('gestion.html')
-    
-
-    
 
 
 @app.route('/editar', methods=['POST', 'GET'])
 @admin_required
 def editar():
     try:
-        exito= False
-        consulta=False
+        exito = False
+        consulta = False
         if request.method == 'POST':
             try:
                 db = get_db()
-                habitaciones = db.execute('SELECT habitacion FROM habitaciones').fetchall()
-                estado = db.execute('SELECT estado FROM habitaciones').fetchall()
+                habitaciones = db.execute(
+                    'SELECT habitacion FROM habitaciones').fetchall()
+                estado = db.execute(
+                    'SELECT estado FROM habitaciones').fetchall()
                 for i in habitaciones:
-                    flash(i,category='info')
+                    flash(i, category='info')
                 for i in estado:
-                    flash(i,category='error')
+                    flash(i, category='error')
             except Exception as e:
                 flash(e)
                 print(e)
@@ -416,18 +419,20 @@ def editar():
             try:
                 db = get_db()
                 id_habitacion = request.form['id']
-                id_habi = db.execute('SELECT habitacion FROM habitaciones WHERE habitacion = :id',{"id":id_habitacion}).fetchone()
+                id_habi = db.execute('SELECT habitacion FROM habitaciones WHERE habitacion = :id', {
+                                     "id": id_habitacion}).fetchone()
                 nombre = request.form['nombre']
                 print(nombre)
                 print(id_habi[0])
                 print(type(id_habi))
 
-                if len(nombre) >=3:
+                if len(nombre) >= 3:
                     db.execute(
-                    'UPDATE habitaciones SET habitacion = :nombre WHERE habitacion = :id',{"nombre":nombre,"id":id_habi[0]})
+                        'UPDATE habitaciones SET habitacion = :nombre WHERE habitacion = :id', {"nombre": nombre, "id": id_habi[0]})
                     print("Funciona")
                     db.commit()
-                    flash("Se realizo la edición de la habitación",category='success')
+                    flash("Se realizo la edición de la habitación",
+                          category='success')
                     return render_template('editar.html')
             except Exception as e:
                 print(e)
@@ -437,11 +442,11 @@ def editar():
                 db = get_db()
                 disponibilidad = request.form['disponibilidad']
                 db.execute(
-                'UPDATE habitaciones SET estado = :estado WHERE habitacion = :id',{"estado":disponibilidad,"id":id_habi[0]})
+                    'UPDATE habitaciones SET estado = :estado WHERE habitacion = :id', {"estado": disponibilidad, "id": id_habi[0]})
                 print("Funciona")
                 db.commit()
                 db.close()
-                flash("Se realizo la edición de la habitación",category='success')
+                flash("Se realizo la edición de la habitación", category='success')
                 return render_template('editar.html')
             except Exception as e:
                 print(e)
@@ -451,19 +456,19 @@ def editar():
     except Exception as e:
         print(e)
         return render_template('editar.html')
-    
 
 
 @app.route('/agregar', methods=['POST', 'GET'])
 @admin_required
 def agregar():
     try:
-        exito= False
-        consulta=False
+        exito = False
+        consulta = False
         if request.method == 'POST':
             try:
                 db = get_db()
-                habitaciones = db.execute('SELECT habitacion FROM habitaciones').fetchall()
+                habitaciones = db.execute(
+                    'SELECT habitacion FROM habitaciones').fetchall()
                 for i in habitaciones:
                     flash(i)
             except Exception as e:
@@ -472,21 +477,23 @@ def agregar():
             print("entra")
             try:
                 crear = request.form['crear']
-                if len(crear) >=3:
+                if len(crear) >= 3:
                     print(crear)
-                    db.execute('INSERT INTO habitaciones (habitacion,estado) VALUES(?,?)',(crear,"Disponible"))
+                    db.execute(
+                        'INSERT INTO habitaciones (habitacion,estado) VALUES(?,?)', (crear, "Disponible"))
                     db.commit()
                     db.close()
                     exito = True
-                    flash("La habitación fue creada exitosamente",category='success')
-                    return render_template('agregar.html',exito=exito)
+                    flash("La habitación fue creada exitosamente",
+                          category='success')
+                    return render_template('agregar.html', exito=exito)
             except Exception as e:
                 print(e)
                 return render_template('agregar.html')
-        return render_template('agregar.html',exito=exito)
+        return render_template('agregar.html', exito=exito)
     except Exception as e:
         print(e)
-        return render_template('agregar.html',exito=exito)
+        return render_template('agregar.html', exito=exito)
 
 
 @app.route('/eliminar', methods=['POST', 'GET'])
@@ -497,13 +504,14 @@ def eliminar():
         if request.method == 'POST':
             try:
                 db = get_db()
-                habitaciones = db.execute('SELECT habitacion FROM habitaciones').fetchall()
+                habitaciones = db.execute(
+                    'SELECT habitacion FROM habitaciones').fetchall()
                 for i in habitaciones:
                     flash(i)
             except Exception as e:
                 flash(e)
                 print(e)
-            
+
             try:
                 terminos = request.form['confirma']
             except Exception as e:
@@ -511,24 +519,25 @@ def eliminar():
                 return render_template("eliminar.html")
 
             try:
-               eliminar = request.form['eliminar']
-               if len(eliminar) >=3:
-                print(eliminar)
-                db.execute('DELETE FROM habitaciones WHERE habitacion = ?',(eliminar,))
-                db.commit()
-                db.close()
-                exito = True
-                flash("La habitación fue eliminada exitosamente",category='success')
-                return render_template('eliminar.html',exito=exito)
+                eliminar = request.form['eliminar']
+                if len(eliminar) >= 3:
+                    print(eliminar)
+                    db.execute(
+                        'DELETE FROM habitaciones WHERE habitacion = ?', (eliminar,))
+                    db.commit()
+                    db.close()
+                    exito = True
+                    flash("La habitación fue eliminada exitosamente",
+                          category='success')
+                    return render_template('eliminar.html', exito=exito)
             except Exception as e:
                 exito = False
                 print(e)
-                return render_template('eliminar.html',exito=exito)
+                return render_template('eliminar.html', exito=exito)
     except Exception as e:
         print(e)
         return render_template('eliminar.html')
     return render_template('eliminar.html')
-
 
 
 if __name__ == '__main__':

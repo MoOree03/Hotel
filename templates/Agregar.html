@@ -37,14 +37,14 @@
 <body class="u-body">
   <header class="u-clearfix u-grey-5 u-header u-header" id="sec-b77b">
     <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
-      <a href="Herramientas" data-page-id="835051" class="u-image u-logo u-image-1" data-image-width="512"
+      <a href="herramientas" data-page-id="835051" class="u-image u-logo u-image-1" data-image-width="512"
         data-image-height="512" title="Inicio">
         <img src="/static/img/hotel.png" class="u-logo-image u-logo-image-1">
       </a>
       <nav class="u-menu u-menu-dropdown u-offcanvas u-menu-1">
         <div class="menu-collapse" style="font-size: 1rem; letter-spacing: 0px; font-weight: 500;">
           <a class="u-button-style u-custom-active-color u-custom-border u-custom-border-color u-custom-hover-color u-custom-left-right-menu-spacing u-custom-padding-bottom u-custom-text-active-color u-custom-text-color u-custom-text-hover-color u-custom-top-bottom-menu-spacing u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base"
-            href="#">
+            href="herramientas">
             <svg>
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#menu-hamburger"></use>
             </svg>
@@ -94,12 +94,12 @@
   <section class="u-align-center u-clearfix u-section-1" id="sec-9642">
     {% with messages = get_flashed_messages(category_filter=["success"]) %}
     {% if messages %}
-      {%for message in messages %}
+    {%for message in messages %}
     <div class="alert alert-success ">{{message}}</div>
-      {% endfor%}
+    {% endfor%}
     {% endif %}
     {% endwith %}
-    
+
     <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
       <div class="u-align-left u-container-style u-group u-group-1">
         <div class="u-container-layout u-container-layout-1">
@@ -129,8 +129,8 @@
             </form>
           </div>
           <div class="u-form u-form-2">
-            <form action="{{url_for('agregar')}}" method="POST"
-              class="u-clearfix  u-form-spacing-15 u-inner-form" style="padding: 15px" source="custom">
+            <form action="{{url_for('agregar')}}" method="POST" class="u-clearfix  u-form-spacing-15 u-inner-form"
+              style="padding: 15px" source="custom">
               <div class="u-form-group u-form-name">
                 <label for="crear" name="crear" class="u-form-control-hidden u-label">Name</label>
                 <input type="text" placeholder="Identificador de la habitación (001)" id="crear" name="crear"
