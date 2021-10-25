@@ -41,15 +41,10 @@ def iniciar():
                 flash(error)
                 print(error)
                 return render_template('iniciar.html')
-            print("si")
             db = get_db()
             user = db.execute(
                 'SELECT * FROM usuarios WHERE Nombre= ?', (username, )).fetchone()
             db.close()
-            adminL = user[8]
-            if adminL == 'Admin':
-                admin = True
-
             if user is None:
                 error = 'Usuario o contraseña inválidos'
                 print(error)
@@ -66,6 +61,11 @@ def iniciar():
                     session.clear()
                     inicioS = False
                     session['user_id'] = user[0]
+            adminL = user[8]
+            if adminL == 'Admin':
+                admin = True
+
+            
             inicioS = True
             return render_template('reserva.html')
         return render_template('iniciar.html', inicioS=inicioS)
@@ -312,18 +312,17 @@ def calificacion():
             conectividad = request.form['conectividad']
             servicio = request.form['habitacion']
             comentario = request.form['comentario']
-            error = None
             exito = False
             promedio = float((int(limpieza) + int(atencion) +
                              int(conectividad) + int(servicio)))/4
+            print(promedio)
             db = get_db()
             id_user = session.get('user_id')
+            print(id_user)
             try:
                 numero = db.execute(
                     'SELECT * FROM Reservas WHERE id_usuario= ?', (id_user,)).fetchone()
                 id_hab = numero[3]
-                print(numero)
-                print(type(numero))
                 db.execute('INSERT INTO Comentarios (Calificacion,Comentario,id_Usuario,id_Habitacion) VALUES (?,?,?,?)',
                            (promedio, comentario, session.get('user_id'), id_hab))
                 db.commit()
@@ -331,7 +330,7 @@ def calificacion():
                 exito = True
                 flash("Gracias por comentar su experiencia!")
             except Exception as e:
-                flash(e)
+                flash("Primero debes reservar una habitación")
                 print(e)
             return render_template('calificacion.html', inicioS=inicioS, exito=exito)
         return render_template('calificacion.html', inicioS=inicioS)
@@ -354,13 +353,105 @@ def herramienta():
 @app.route('/gestion', methods=['POST', 'GET'])
 @admin_required
 def gestion():
+    try:
+        if request.method == 'POST':
+            try:
+                db = get_db()
+                comentarios = db.execute('SELECT Comentario FROM Comentarios').fetchall()
+                calificacion = db.execute('SELECT Calificacion FROM Comentarios').fetchall()
+                usuarios =db.execute('SELECT id_Usuario FROM Comentarios').fetchall()
+                for i in comentarios:
+                    flash(i,category='warning')
+                for a in calificacion:
+                    flash(a,category='info')
+                for b in usuarios:
+                    flash(b,category='error')
+            except Exception as e:
+                print(e)
+            try:
+                terminos = request.form['terminos']
+            except Exception as e:
+                print("Debe aceptar los términos y condiciones antes de avanzar")
+                return render_template('gestion.html')
+
+            try:
+                eliminar = request.form['eliminar']
+                print(eliminar)
+                db.execute('DELETE FROM Comentarios WHERE id_Usuario = ?',(eliminar,))
+                db.commit()
+                db.close()
+                flash("El comentario fue eliminada exitosamente",category='success')
+                return render_template('gestion.html')
+            except Exception as e:
+                print(e)
+                return render_template('gestion.html')
+    except Exception as e:
+        print(e)
+        return render_template('gestion.html')
     return render_template('gestion.html')
+    
+
+    
 
 
 @app.route('/editar', methods=['POST', 'GET'])
 @admin_required
 def editar():
-    return render_template('editar.html')
+    try:
+        exito= False
+        consulta=False
+        if request.method == 'POST':
+            try:
+                db = get_db()
+                habitaciones = db.execute('SELECT habitacion FROM habitaciones').fetchall()
+                estado = db.execute('SELECT estado FROM habitaciones').fetchall()
+                for i in habitaciones:
+                    flash(i,category='info')
+                for i in estado:
+                    flash(i,category='error')
+            except Exception as e:
+                flash(e)
+                print(e)
+            print("entra")
+            try:
+                db = get_db()
+                id_habitacion = request.form['id']
+                id_habi = db.execute('SELECT habitacion FROM habitaciones WHERE habitacion = :id',{"id":id_habitacion}).fetchone()
+                nombre = request.form['nombre']
+                print(nombre)
+                print(id_habi[0])
+                print(type(id_habi))
+
+                if len(nombre) >=3:
+                    db.execute(
+                    'UPDATE habitaciones SET habitacion = :nombre WHERE habitacion = :id',{"nombre":nombre,"id":id_habi[0]})
+                    print("Funciona")
+                    db.commit()
+                    flash("Se realizo la edición de la habitación",category='success')
+                    return render_template('editar.html')
+            except Exception as e:
+                print(e)
+                print("Valio")
+                return render_template('editar.html')
+            try:
+                db = get_db()
+                disponibilidad = request.form['disponibilidad']
+                db.execute(
+                'UPDATE habitaciones SET estado = :estado WHERE habitacion = :id',{"estado":disponibilidad,"id":id_habi[0]})
+                print("Funciona")
+                db.commit()
+                db.close()
+                flash("Se realizo la edición de la habitación",category='success')
+                return render_template('editar.html')
+            except Exception as e:
+                print(e)
+                print("Valio")
+                return render_template('editar.html')
+        return render_template('editar.html')
+    except Exception as e:
+        print(e)
+        return render_template('editar.html')
+    
 
 
 @app.route('/agregar', methods=['POST', 'GET'])
@@ -368,6 +459,7 @@ def editar():
 def agregar():
     try:
         exito= False
+        consulta=False
         if request.method == 'POST':
             try:
                 db = get_db()
@@ -377,21 +469,20 @@ def agregar():
             except Exception as e:
                 flash(e)
                 print(e)
+            print("entra")
             try:
-               crear = request.form['crear']
-               if len(crear) >=3:
-                print(crear)
-                db.execute('INSERT INTO habitaciones (habitacion,estado) VALUES(?,?)',(crear,"Disponible"))
-                db.commit()
-                db.close()
-                exito = True
-                print("Work")
-                flash("La habitación fue creada exitosamente")
-                return render_template('agregar.html',exito=exito)
+                crear = request.form['crear']
+                if len(crear) >=3:
+                    print(crear)
+                    db.execute('INSERT INTO habitaciones (habitacion,estado) VALUES(?,?)',(crear,"Disponible"))
+                    db.commit()
+                    db.close()
+                    exito = True
+                    flash("La habitación fue creada exitosamente",category='success')
+                    return render_template('agregar.html',exito=exito)
             except Exception as e:
-                print("NO sirve bro")
-                exito = False
-                return render_template('agregar.html',exito=exito)
+                print(e)
+                return render_template('agregar.html')
         return render_template('agregar.html',exito=exito)
     except Exception as e:
         print(e)
@@ -401,7 +492,43 @@ def agregar():
 @app.route('/eliminar', methods=['POST', 'GET'])
 @admin_required
 def eliminar():
+    try:
+        exito = False
+        if request.method == 'POST':
+            try:
+                db = get_db()
+                habitaciones = db.execute('SELECT habitacion FROM habitaciones').fetchall()
+                for i in habitaciones:
+                    flash(i)
+            except Exception as e:
+                flash(e)
+                print(e)
+            
+            try:
+                terminos = request.form['confirma']
+            except Exception as e:
+                print("Debe aceptar los términos y condiciones antes de avanzar")
+                return render_template("eliminar.html")
+
+            try:
+               eliminar = request.form['eliminar']
+               if len(eliminar) >=3:
+                print(eliminar)
+                db.execute('DELETE FROM habitaciones WHERE habitacion = ?',(eliminar,))
+                db.commit()
+                db.close()
+                exito = True
+                flash("La habitación fue eliminada exitosamente",category='success')
+                return render_template('eliminar.html',exito=exito)
+            except Exception as e:
+                exito = False
+                print(e)
+                return render_template('eliminar.html',exito=exito)
+    except Exception as e:
+        print(e)
+        return render_template('eliminar.html')
     return render_template('eliminar.html')
+
 
 
 if __name__ == '__main__':

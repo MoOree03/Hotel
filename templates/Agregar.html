@@ -92,8 +92,8 @@
     </div>
   </header>
   <section class="u-align-center u-clearfix u-section-1" id="sec-9642">
-    {% with messages = get_flashed_messages() %}
-    {% if messages and exito %}
+    {% with messages = get_flashed_messages(category_filter=["success"]) %}
+    {% if messages %}
       {%for message in messages %}
     <div class="alert alert-success ">{{message}}</div>
       {% endfor%}
@@ -115,7 +115,7 @@
                   {% with messages = get_flashed_messages() %}
                   {% if messages and not exito %}
                     {%for message in messages %}
-                    {{message}}
+                      {{message}}
                     {% endfor%}
                   {% endif %}
                   {% endwith %}
