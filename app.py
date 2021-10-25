@@ -13,6 +13,7 @@ app.secret_key = os.urandom(12)
 inicioS = False
 admin = False
 
+
 @app.route('/', methods=['GET'])
 def inicio():
     # Si inicio sesion -> Mostrar bienvenida, y cambio de navbar
@@ -28,30 +29,30 @@ def iniciar():
         if request.method == 'POST':
             username = request.form['usuario']
             password = request.form['password']
-
-            db = get_db()
             error = None
-
             if not username:
                 error = 'Debes ingresar un usuario'
                 flash(error)
+                print(error)
                 return render_template('iniciar.html')
 
             if not password:
                 error = 'Debes ingresar una contraseña'
                 flash(error)
+                print(error)
                 return render_template('iniciar.html')
-
+            print("si")
+            db = get_db()
             user = db.execute(
                 'SELECT * FROM usuarios WHERE Nombre= ?', (username, )).fetchone()
-            
-            adminL=user[8]
-            if adminL =='Admin':
-                admin=True
-                
-            print(user)
+            db.close()
+            adminL = user[8]
+            if adminL == 'Admin':
+                admin = True
+
             if user is None:
                 error = 'Usuario o contraseña inválidos'
+                print(error)
                 flash(error)
                 return render_template('iniciar.html')
             else:
@@ -59,6 +60,7 @@ def iniciar():
                 result = check_password_hash(store_password, password)
                 if result is False:
                     error = 'Usuario o contraseña inválidos'
+                    flash(error)
                     return render_template('iniciar.html')
                 else:
                     session.clear()
@@ -79,6 +81,7 @@ def login_required(view):
             return redirect(url_for('iniciar'))
         return view(**kwargs)
     return wrapped_view
+
 
 def admin_required(view):
     @functools.wraps(view)
@@ -204,33 +207,33 @@ def registro():
 
 @app.route('/recuperar', methods=['POST', 'GET'])
 def recuperar():
-        try:
-            if request.method == 'POST':
-                email = request.form['email']
-                error = None
-                exito = False
+    try:
+        if request.method == 'POST':
+            email = request.form['email']
+            error = None
+            exito = False
 
-                if not utils.isEmailValid(email):
-                    error = "El email no es valido"
-                    flash(error)
-                    return render_template('recuperar.html')
+            if not utils.isEmailValid(email):
+                error = "El email no es valido"
+                flash(error)
+                return render_template('recuperar.html')
 
-                db = get_db()
+            db = get_db()
 
-                validacion = db.execute(
-                    'SELECT Email FROM usuarios WHERE Email=?', (email,)).fetchone()
-                print(validacion)
-                if validacion is None:
-                    error = 'El usuario no existe'.format(email)
-                    flash(error)
-                    return render_template('recuperar.html')
+            validacion = db.execute(
+                'SELECT Email FROM usuarios WHERE Email=?', (email,)).fetchone()
+            print(validacion)
+            if validacion is None:
+                error = 'El usuario no existe'.format(email)
+                flash(error)
+                return render_template('recuperar.html')
 
-                exito = True
-                flash('Hemos enviado un mensaje a su correo')
-                return render_template('recuperar.html', inicioS=inicioS, exito=exito)
-            return render_template('recuperar.html',inicioS=inicioS)
-        except Exception as e:
-            return render_template('recuperar.html',inicioS=inicioS)
+            exito = True
+            flash('Hemos enviado un mensaje a su correo')
+            return render_template('recuperar.html', inicioS=inicioS, exito=exito)
+        return render_template('recuperar.html', inicioS=inicioS)
+    except Exception as e:
+        return render_template('recuperar.html', inicioS=inicioS)
 
 
 @app.route('/habitacion', methods=['GET'])
@@ -283,7 +286,7 @@ def reserva():
                 return render_template('reserva.html')
             try:
                 db.execute('INSERT INTO Reservas (Llegada,Salida,id_Habitacion,NumeroPersonas,id_usuario) VALUES (?,?,?,?,?)',
-                           (llegada, salida, habitacion, numero, session.get('user_id')))        
+                           (llegada, salida, habitacion, numero, session.get('user_id')))
                 db.execute(
                     'UPDATE habitaciones SET estado = "Ocupada" WHERE habitaciones.habitacion =?', (habita))
                 db.commit()
@@ -299,7 +302,7 @@ def reserva():
         return render_template('reserva.html')
 
 
-@app.route('/calificacion', methods=['GET','POST'])
+@app.route('/calificacion', methods=['GET', 'POST'])
 @login_required
 def calificacion():
     try:
@@ -311,17 +314,18 @@ def calificacion():
             comentario = request.form['comentario']
             error = None
             exito = False
-            promedio = float((int(limpieza) + int(atencion) + int(conectividad) + int(servicio)))/4
+            promedio = float((int(limpieza) + int(atencion) +
+                             int(conectividad) + int(servicio)))/4
             db = get_db()
-            id_user=session.get('user_id')
+            id_user = session.get('user_id')
             try:
                 numero = db.execute(
-                'SELECT * FROM Reservas WHERE id_usuario= ?',(id_user,)).fetchone()
-                id_hab=numero[3]
+                    'SELECT * FROM Reservas WHERE id_usuario= ?', (id_user,)).fetchone()
+                id_hab = numero[3]
                 print(numero)
                 print(type(numero))
                 db.execute('INSERT INTO Comentarios (Calificacion,Comentario,id_Usuario,id_Habitacion) VALUES (?,?,?,?)',
-                           (promedio, comentario, session.get('user_id'),id_hab))
+                           (promedio, comentario, session.get('user_id'), id_hab))
                 db.commit()
                 db.close()
                 exito = True
@@ -362,7 +366,36 @@ def editar():
 @app.route('/agregar', methods=['POST', 'GET'])
 @admin_required
 def agregar():
-    return render_template('agregar.html')
+    try:
+        exito= False
+        if request.method == 'POST':
+            try:
+                db = get_db()
+                habitaciones = db.execute('SELECT habitacion FROM habitaciones').fetchall()
+                for i in habitaciones:
+                    flash(i)
+            except Exception as e:
+                flash(e)
+                print(e)
+            try:
+               crear = request.form['crear']
+               if len(crear) >=3:
+                print(crear)
+                db.execute('INSERT INTO habitaciones (habitacion,estado) VALUES(?,?)',(crear,"Disponible"))
+                db.commit()
+                db.close()
+                exito = True
+                print("Work")
+                flash("La habitación fue creada exitosamente")
+                return render_template('agregar.html',exito=exito)
+            except Exception as e:
+                print("NO sirve bro")
+                exito = False
+                return render_template('agregar.html',exito=exito)
+        return render_template('agregar.html',exito=exito)
+    except Exception as e:
+        print(e)
+        return render_template('agregar.html',exito=exito)
 
 
 @app.route('/eliminar', methods=['POST', 'GET'])
