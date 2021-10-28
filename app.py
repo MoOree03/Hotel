@@ -64,9 +64,8 @@ def iniciar():
             adminL = user[8]
             if adminL == 'Admin':
                 admin = True
-
             inicioS = True
-            return render_template('reserva.html')
+            return render_template('reserva.html',inicioS=inicioS)
         return render_template('iniciar.html', inicioS=inicioS)
     except Exception as ex:
         print(ex)
