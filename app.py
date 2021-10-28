@@ -1,12 +1,30 @@
 import re
 from flask import Flask, render_template, request, flash, redirect, url_for, session,\
-    make_response, g
+    g
+import yagmail
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import utils
 from db import get_db
 import functools
 
+correo_envia = 'mintic202221@gmail.com'
+contraseña_envia = 'Mintic2022'
+yag = yagmail.SMTP(user=correo_envia, password=contraseña_envia)
+
+tema_registro = 'Activa tu cuenta'
+contenido_registro = [
+    'Estas a un paso de completar tu registro en HyattLumpur Hotel\n'
+    'Da clic en el siguiente link\n'
+    'link'
+]
+tema_reserva = 'Recibo de su reserva'
+
+tema_recupera = '¿Olvidaste tu contraseña'
+recupera_contenido = [
+    'Para restablecer tu contraseña da click en en siguiente enlace\n'
+    'ENLACE'
+]
 
 app = Flask(__name__)
 app.secret_key = os.urandom(12)
@@ -65,7 +83,7 @@ def iniciar():
             if adminL == 'Admin':
                 admin = True
             inicioS = True
-            return render_template('reserva.html',inicioS=inicioS)
+            return render_template('reserva.html', inicioS=inicioS)
         return render_template('iniciar.html', inicioS=inicioS)
     except Exception as ex:
         print(ex)
@@ -187,9 +205,11 @@ def registro():
             try:
                 db.execute('INSERT INTO usuarios (Nombre,Tipo_Documento,Numero,Pais,Email,Contraseña,Telefono) VALUES (?,?,?,?,?,?,?)',
                            (nombre, tipo_documento, numero, pais, email, generate_password_hash(password), telefono))
+
                 db.commit()
                 db.close()
-
+                yag.send(to=email, subject=tema_registro,
+                         contents=contenido_registro)
                 print("Guarda")
                 exito = True
                 render_template('registro.html')
@@ -210,14 +230,11 @@ def recuperar():
             email = request.form['email']
             error = None
             exito = False
-
             if not utils.isEmailValid(email):
                 error = "El email no es valido"
                 flash(error)
                 return render_template('recuperar.html')
-
             db = get_db()
-
             validacion = db.execute(
                 'SELECT Email FROM usuarios WHERE Email=?', (email,)).fetchone()
             print(validacion)
@@ -225,9 +242,10 @@ def recuperar():
                 error = 'El usuario no existe'.format(email)
                 flash(error)
                 return render_template('recuperar.html')
-
             exito = True
             flash('Hemos enviado un mensaje a su correo')
+            yag.send(to=email, subject=tema_recupera,
+                     contents=recupera_contenido)
             return render_template('recuperar.html', inicioS=inicioS, exito=exito)
         return render_template('recuperar.html', inicioS=inicioS)
     except Exception as e:
@@ -249,19 +267,8 @@ def reserva():
             salida = request.form['salida']
             habitacion = request.form['habi']
             numero = request.form['numero']
-
             error = None
             exito = False
-
-            if not utils.isDateValid(llegada):
-                error = "La fecha de llegada no es valida"
-                flash(error)
-                return render_template('reserva.html')
-
-            if not utils.isDateValid(salida):
-                error = "La fecha de salida no es valida"
-                flash(error)
-                return render_template('reserva.html')
 
             try:
                 terminos = request.form['terminos']
@@ -269,14 +276,13 @@ def reserva():
                 e = "Debe aceptar los terminos y condiciones antes de avanzar"
                 flash(e)
                 return render_template("reserva.html")
-
             db = get_db()
-
             disponibilidad = db.execute(
                 'SELECT estado FROM habitaciones WHERE habitacion=?', (habitacion,)).fetchone()
+            user_email = db.execute(
+                'SELECT Email FROM usuarios WHERE id=?', (session.get('user_id'),)).fetchone()
             habita = db.execute(
                 'SELECT Habitacion FROM Habitaciones WHERE Habitacion=?', (habitacion,)).fetchone()
-
             if disponibilidad == ('Ocupada',):
                 error = 'Habitación ocupada, seleccione otra'.format(
                     disponibilidad)
@@ -291,13 +297,17 @@ def reserva():
                 db.close()
                 exito = True
                 flash("La reserva se ha completado exitosamente")
+                contenido = ('Ha realizado una reserva para el dia %s hasta %s en la habitacion %s para %s personas\n ¡Esperamos que nuestras instalaciones sean de su agrado!') % (
+                    llegada, salida, habitacion, numero)
+                yag.send(to=user_email, subject=tema_reserva,
+                         contents=contenido)
             except Exception as e:
                 flash(e)
                 print(e)
             return render_template('reserva.html', inicioS=inicioS, exito=exito)
-        return render_template('reserva.html',inicioS=inicioS)
+        return render_template('reserva.html', inicioS=inicioS)
     except Exception as e:
-        return render_template('reserva.html',inicioS=inicioS)
+        return render_template('reserva.html', inicioS=inicioS)
 
 
 @app.route('/calificacion', methods=['GET', 'POST'])

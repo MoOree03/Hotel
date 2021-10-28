@@ -2,7 +2,6 @@ import re
 email_regex="^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
 pass_regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$"
 user_regex = "^[a-zA-Z0-9_.-]+$"
-date_regex = "^([1-9] |1[0-9]| 2[0-9]|3[0-1])(.|-)([1-9] |1[0-2])(.|-|)20[0-9][0-9]$"
 F_ACTIVE = 'ACTIVE'
 F_INACTIVE = 'INACTIVE'
 EMAIL_APP = 'EMAIL_APP'
@@ -12,11 +11,6 @@ U_UNCONFIRMED = 'UNCONFIRMED'
 U_CONFIRMED = 'CONFIRMED'
 
 
-def isDateValid(date):
-    if re.search(date_regex, date):
-        return True
-    else: 
-        return False
 
 def isEmailValid(email):
     if re.search(email_regex,email):
