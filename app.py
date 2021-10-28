@@ -295,9 +295,9 @@ def reserva():
                 flash(e)
                 print(e)
             return render_template('reserva.html', inicioS=inicioS, exito=exito)
-        return render_template('reserva.html')
+        return render_template('reserva.html',inicioS=inicioS)
     except Exception as e:
-        return render_template('reserva.html')
+        return render_template('reserva.html',inicioS=inicioS)
 
 
 @app.route('/calificacion', methods=['GET', 'POST'])
