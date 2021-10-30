@@ -4,13 +4,7 @@
 <link rel="stylesheet" href="/static/css/GestionComentarios.css" media=" screen"> {% endblock %}
 {% block contenido %}
 <section class="u-align-center u-clearfix u-section-1" id="sec-9642">
-  {% with messages = get_flashed_messages(category_filter=["success"]) %}
-  {% if messages %}
-  {%for message in messages %}
-  <div class="alert alert-success ">{{message}}</div>
-  {% endfor%}
-  {% endif %}
-  {% endwith %}
+
   <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
     <div class="u-align-left u-container-style u-group u-group-1">
       <div class="u-container-layout u-container-layout-1">
@@ -21,33 +15,7 @@
             style="padding: 15px;" source="custom" name="form">
             <div class="u-form-group u-form-partition-factor-4 u-form-textarea u-form-group-2">
               <label for="textarea-8ac3" class="u-label">Usuarios</label>
-              <textarea rows="10" cols="10" id="textarea-8ac3" name="ges_lista_com"
-                class="u-border-1 u-border-grey-30 u-input u-input-rectangle">
-                  {% with messages = get_flashed_messages(category_filter=["error"]) %}
-                  {% if messages %}
-                    {%for message in messages %}
-                  {{message}}
-                    {% endfor%}
-                  {% endif %}
-                  {% endwith %}
-                </textarea>
-            </div>
-            <div class="u-form-group u-form-partition-factor-4 u-form-textarea u-form-group-3">
-              <label for="textarea-13b2" class="u-label">Calificación</label>
-              <textarea rows="10" cols="10" id="textarea-13b2" name="ges_lista_cal"
-                class="u-border-1 u-border-grey-30 u-input u-input-rectangle">
-                  {% with messages = get_flashed_messages(category_filter=["info"]) %}
-                  {% if messages %}
-                    {%for message in messages %}
-                  {{message}}
-                    {% endfor%}
-                  {% endif %}
-                  {% endwith %}
-                </textarea>
-            </div>
-            <div class="u-form-group u-form-partition-factor-4 u-form-textarea u-form-group-4">
-              <label for="textarea-4e5b" class="u-label">Comentarios</label>
-              <textarea rows="10" cols="10" id="textarea-4e5b" name="ges_lista_usua"
+              <textarea rows="10" id="textarea-8ac3" name="ges_lista_com"
                 class="u-border-1 u-border-grey-30 u-input u-input-rectangle">
                   {% with messages = get_flashed_messages(category_filter=["warning"]) %}
                   {% if messages %}
@@ -55,7 +23,7 @@
                   {{message}}
                     {% endfor%}
                   {% endif %}
-                  {% endwith %}                
+                  {% endwith %}
                 </textarea>
             </div>
             <div class="u-align-center u-form-group u-form-submit">
@@ -90,4 +58,11 @@
     </div>
   </div>
 </section>
+{% with messages = get_flashed_messages(category_filter=["success"]) %}
+  {% if messages %}
+  {%for message in messages %}
+  <div class="alert alert-success text-center">{{message}}</div>
+  {% endfor%}
+  {% endif %}
+  {% endwith %}
 {% endblock %}

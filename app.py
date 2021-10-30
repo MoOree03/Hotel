@@ -30,6 +30,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom(12)
 inicioS = False
 admin = False
+superAdmin= False
 
 
 @app.route('/', methods=['GET'])
@@ -43,6 +44,7 @@ def inicio():
 def iniciar():
     global inicioS
     global admin
+    global superAdmin
     try:
         if request.method == 'POST':
             username = request.form['usuario']
@@ -82,10 +84,12 @@ def iniciar():
             adminL = user[8]
             if adminL == 'Admin':
                 admin = True
+            if adminL == 'SuperAdmin':
+                superAdmin = True
             inicioS = True
             return redirect(url_for('reserva'))
         return render_template('iniciar.html', inicioS=inicioS)
-    except Exception as ex:
+    except Exception as e:
         return render_template('iniciar.html')
 
 
@@ -102,17 +106,28 @@ def admin_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None or admin == False:
+            if superAdmin==True:
+                return view(**kwargs)
             return redirect(url_for('inicio'))
         return view(**kwargs)
     return wrapped_view
 
+def super_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None or superAdmin == False:
+            return redirect(url_for('inicio'))
+        return view(**kwargs)
+    return wrapped_view
 
 @app.route('/salir')
 def salir():
     global inicioS
     global admin
+    global superAdmin
     inicioS = False
     admin = False
+    superAdmin=False
     session.clear()
     return redirect(url_for('inicio'))
 
@@ -404,7 +419,7 @@ def comentarios():
 @app.route('/herramientas', methods=['GET'])
 @admin_required
 def herramienta():
-    return render_template('herramientas.html')
+    return render_template('herramientas.html',superAdmin=superAdmin)
 
 
 @app.route('/gestion', methods=['POST', 'GET'])
@@ -415,17 +430,9 @@ def gestion():
             try:
                 db = get_db()
                 comentarios = db.execute(
-                    'SELECT Comentario FROM Comentarios').fetchall()
-                calificacion = db.execute(
-                    'SELECT Calificacion FROM Comentarios').fetchall()
-                usuarios = db.execute(
-                    'SELECT id_Usuario FROM Comentarios').fetchall()
+                    'SELECT id,id_Usuario,Calificacion,Comentario FROM Comentarios').fetchall()
                 for i in comentarios:
                     flash(i, category='warning')
-                for a in calificacion:
-                    flash(a, category='info')
-                for b in usuarios:
-                    flash(b, category='error')
             except Exception as e:
                 print("")
             try:
@@ -436,11 +443,12 @@ def gestion():
             try:
                 eliminar = request.form['eliminar']
                 db.execute(
-                    'DELETE FROM Comentarios WHERE id_Usuario = ?', (eliminar,))
+                    'DELETE FROM Comentarios WHERE id = ?', (eliminar,))
                 db.commit()
                 db.close()
-                flash("El comentario fue eliminada exitosamente",
+                flash("El comentario fue eliminado exitosamente",
                       category='success')
+                
                 return render_template('gestion.html')
             except Exception as e:
                 return render_template('gestion.html')
@@ -454,19 +462,15 @@ def gestion():
 @admin_required
 def editar():
     try:
-        exito = False
-        consulta = False
         if request.method == 'POST':
             try:
                 db = get_db()
                 habitaciones = db.execute(
-                    'SELECT habitacion FROM habitaciones').fetchall()
-                estado = db.execute(
-                    'SELECT estado FROM habitaciones').fetchall()
+                    'SELECT habitacion,estado FROM habitaciones').fetchall()
+                
                 for i in habitaciones:
                     flash(i, category='info')
-                for i in estado:
-                    flash(i, category='error')
+                
             except Exception as e:
                 flash(e)
             try:
@@ -545,14 +549,11 @@ def eliminar():
                 habitaciones = db.execute(
                     'SELECT habitacion FROM habitaciones').fetchall()
                 for i in habitaciones:
-                    flash(i)
+                    flash(i,category="info")
             except Exception as e:
                 flash(e)
 
-            try:
-                terminos = request.form['confirma']
-            except Exception as e:
-                return render_template("eliminar.html")
+            
 
             try:
                 eliminar = request.form['eliminar']
@@ -562,9 +563,16 @@ def eliminar():
                     db.commit()
                     db.close()
                     exito = True
+                    try:
+                        terminos = request.form['confirma']
+                    except Exception as e:
+                        flash("Debe confirmar eliminación",category="error")
+                        return render_template("eliminar.html")
                     flash("La habitación fue eliminada exitosamente",
                           category='success')
                     return render_template('eliminar.html', exito=exito)
+                flash("Debe ingresar habitación a eliminar",category="error")
+                return render_template('eliminar.html', exito=exito)
             except Exception as e:
                 exito = False
                 return render_template('eliminar.html', exito=exito)
@@ -572,6 +580,79 @@ def eliminar():
         return render_template('eliminar.html')
     return render_template('eliminar.html')
 
+@app.route('/superUser', methods=['GET','POST'])
+@super_required
+def superUser ():
+    db = get_db()
+    try:
+        if request.method == 'POST':
+            try:
+                usuarios = db.execute(
+                    'SELECT id, Nombre,rol FROM usuarios').fetchall()
+                for i in usuarios:
+                    flash(i, category='info')
+
+            except Exception as e:
+                flash(e)
+                return render_template('superUser.html')
+            try:
+                id_seleccionado = request.form['id']
+                while len(id_seleccionado) <1 :
+                    id_seleccionado = request.form['id']
+                    flash("Debe ingresar el id de usuario",category="error")
+                    return render_template('superUser.html')
+                nuevo = request.form['nuevo']
+                if(len(nuevo)>0):
+                    db.execute(
+                        'UPDATE usuarios SET Nombre = :nombre WHERE id = :id', {"nombre": nuevo, "id":id_seleccionado})
+                    db.commit()
+                    flash("Se realizo la edicion del nombre de usuario",
+                            category='success')
+                    return render_template('superUser.html')
+            except Exception as e:
+                print("")
+                
+                
+            try:
+                
+                rol = request.form['estado']
+                db.execute(
+                    'UPDATE usuarios SET rol = :estado WHERE id = :id', {"estado": rol, "id":id_seleccionado})
+                db.commit()
+                
+                flash("Se realizo la edición del rol", category='success')
+                return render_template('superUser.html')
+            except Exception as e:
+                print("")
+            try:
+                db = get_db()
+                print("a")
+                eliminar = request.form['eliminar']
+                print("a")
+                while len(eliminar) <1 :
+                    eliminar = request.form['eliminar']
+                    print("b")
+                    flash("Debe ingresar el id de usuario",category="error")
+                    return render_template('superUser.html')
+                db.execute(
+                    'DELETE FROM usuarios WHERE id = ?', (eliminar,))
+                db.commit()
+                try:
+                    terminos = request.form['confirmar']
+                except Exception as e:
+                    print(e)
+                    flash("Debe confirmar eliminación",category="error")
+                    return render_template("superUser.html")
+                flash("Se realizo la eliminación del usuario", category='success')
+                return render_template('superUser.html')
+            except Exception as e:
+                print(e)
+                return render_template('superUser.html')
+        return render_template('superUser.html')
+    except Exception as e:
+        print(e)
+        return render_template('superUser.html')
+    
 
 if __name__ == '__main__':
     app.debug = True

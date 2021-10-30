@@ -4,13 +4,6 @@
 <link rel="stylesheet" href="/static/css/Agregar.css" media=" screen"> {% endblock %}
 {% block contenido %}
 <section class="u-align-center u-clearfix u-section-1" id="sec-9642">
-  {% with messages = get_flashed_messages(category_filter=["success"]) %}
-  {% if messages %}
-  {%for message in messages %}
-  <div class="alert alert-success ">{{message}}</div>
-  {% endfor%}
-  {% endif %}
-  {% endwith %}
   <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
     <div class="u-align-left u-container-style u-group u-group-1">
       <div class="u-container-layout u-container-layout-1">
@@ -58,4 +51,11 @@
     </div>
   </div>
 </section>
+{% with messages = get_flashed_messages(category_filter=["success"]) %}
+  {% if messages %}
+  {%for message in messages %}
+  <div class="alert alert-success text-center">{{message}}</div>
+  {% endfor%}
+  {% endif %}
+  {% endwith %}
 {% endblock %}

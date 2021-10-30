@@ -4,13 +4,7 @@
 <link rel="stylesheet" href="/static/css/Editar.css" media=" screen"> {% endblock %}
 {% block contenido %}
 <section class="u-align-center u-clearfix u-section-1" id="sec-9642">
-  {% with messages = get_flashed_messages(category_filter=["success"]) %}
-  {% if messages %}
-  {%for message in messages %}
-  <div class="alert alert-success ">{{message}}</div>
-  {% endfor%}
-  {% endif %}
-  {% endwith %}
+  
   <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
     <div class="u-align-left u-container-style u-group u-group-1">
       <div class="u-container-layout u-container-layout-1">
@@ -19,24 +13,12 @@
         <div class="u-form u-form-1">
           <form action="{{url_for('editar')}}" method="POST" class="u-clearfix u-form-spacing-15 u-inner-form"
             style="padding: 15px;" source="custom" name="form">
-            <div class="u-form-group u-form-partition-factor-2 u-form-textarea u-form-group-1">
-              <label for="habitaciones" class="u-label">Habitaciones</label>
-              <textarea rows="10" cols="50" id="habitaciones" name="habitaciones"
-                class="u-border-1 u-border-grey-30 u-input u-input-rectangle">
-                  {% with messages = get_flashed_messages(category_filter=["info"]) %}
-                  {% if messages %}
-                    {%for message in messages %}
-                  {{message}}
-                    {% endfor%}
-                  {% endif %}
-                  {% endwith %}
-                </textarea>
-            </div>
+          
             <div class="u-form-group u-form-partition-factor-2 u-form-textarea u-form-group-2">
-              <label for="estado" class="u-label">Estado</label>
+              <label for="estado" class="u-label">Habitación-Estado</label>
               <textarea rows="10" cols="50" id="estado" name="estado"
                 class="u-border-1 u-border-grey-30 u-input u-input-rectangle">
-                  {% with messages = get_flashed_messages(category_filter=["error"]) %}
+                  {% with messages = get_flashed_messages(category_filter=["info"]) %}
                   {% if messages %}
                     {%for message in messages %}
                   {{message}}
@@ -89,4 +71,11 @@
     </div>
   </div>
 </section>
+{% with messages = get_flashed_messages(category_filter=["success"]) %}
+  {% if messages %}
+  {%for message in messages %}
+  <div class="alert alert-success text-center">{{message}}</div>
+  {% endfor%}
+  {% endif %}
+  {% endwith %}
 {% endblock %}
