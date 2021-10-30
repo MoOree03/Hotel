@@ -1,3 +1,4 @@
+import re
 from flask import Flask, render_template, request, flash, redirect, url_for, session,\
     g
 import yagmail
@@ -50,13 +51,11 @@ def iniciar():
             if not username:
                 error = 'Debes ingresar un usuario'
                 flash(error)
-                print(error)
                 return render_template('iniciar.html')
 
             if not password:
                 error = 'Debes ingresar una contraseña'
                 flash(error)
-                print(error)
                 return render_template('iniciar.html')
             db = get_db()
             user = db.execute(
@@ -67,7 +66,6 @@ def iniciar():
             db.close()
             if user is None:
                 error = 'Usuario o contraseña inválidos'
-                print(error)
                 flash(error)
                 return render_template('iniciar.html')
             else:
@@ -88,7 +86,6 @@ def iniciar():
             return redirect(url_for('reserva'))
         return render_template('iniciar.html', inicioS=inicioS)
     except Exception as ex:
-        print(ex)
         return render_template('iniciar.html')
 
 
@@ -169,7 +166,6 @@ def registro():
                 error = "La confirmación no es valida"
                 if (password != confirma):
                     error = "La contraseña debe coincidir con la confirmación"
-                    print(error)
                 flash(error)
                 return render_template('registro.html')
 
@@ -215,12 +211,11 @@ def registro():
                 exito = True
                 render_template('registro.html')
             except Exception as e:
-                print(e)
+                print("")
             return redirect(url_for('iniciar'))
 
         return render_template('registro.html')
     except Exception as e:
-        print(e)
         return render_template('registro.html')
 
 
@@ -238,7 +233,6 @@ def recuperar():
             db = get_db()
             validacion = db.execute(
                 'SELECT Email FROM usuarios WHERE Email=?', (email,)).fetchone()
-            print(validacion)
             if validacion is None:
                 error = 'El usuario no existe'.format(email)
                 flash(error)
@@ -284,7 +278,6 @@ def reserva():
             habitacion = habitacion.replace(')', '')
             habitacion = habitacion.replace("'", "")
             habitacion = habitacion.replace(',', '')
-            print(habitacion)
             try:
                 terminos = request.form['terminos']
             except Exception as e:
@@ -325,7 +318,6 @@ def reserva():
             return render_template('reserva.html', inicioS=inicioS, exito=exito, lista=lista)
         return render_template('reserva.html', inicioS=inicioS, lista=lista)
     except Exception as e:
-        print(e)
         return render_template('reserva.html', inicioS=inicioS,lista=lista)
 
 
@@ -368,7 +360,6 @@ def calificacion():
             return render_template('calificacion.html', inicioS=inicioS, exito=exito)
         return render_template('calificacion.html', inicioS=inicioS)
     except Exception as e:
-        print(e)
         return render_template('calificacion.html', inicioS=inicioS)
 
 
@@ -407,7 +398,6 @@ def comentarios():
         return render_template('comentarios.html', inicioS=inicioS, nombre=nombre, fecha=fecha, comentarios=comentarios,tamano=tamano)
     except Exception as e:
         flash(e)
-        print(e)
     return render_template('comentarios.html', inicioS=inicioS)
 
 
@@ -437,7 +427,7 @@ def gestion():
                 for b in usuarios:
                     flash(b, category='error')
             except Exception as e:
-                print(e)
+                print("")
             try:
                 terminos = request.form['terminos']
             except Exception as e:
@@ -453,10 +443,9 @@ def gestion():
                       category='success')
                 return render_template('gestion.html')
             except Exception as e:
-                print(e)
                 return render_template('gestion.html')
     except Exception as e:
-        print(e)
+        print("")
         return render_template('gestion.html')
     return render_template('gestion.html')
 
@@ -480,7 +469,6 @@ def editar():
                     flash(i, category='error')
             except Exception as e:
                 flash(e)
-                print(e)
             try:
                 db = get_db()
                 id_habitacion = request.form['id']
@@ -496,7 +484,6 @@ def editar():
                           category='success')
                     return render_template('editar.html')
             except Exception as e:
-                print(e)
                 return render_template('editar.html')
             try:
                 db = get_db()
@@ -508,11 +495,9 @@ def editar():
                 flash("Se realizo la edición de la habitación", category='success')
                 return render_template('editar.html')
             except Exception as e:
-                print(e)
                 return render_template('editar.html')
         return render_template('editar.html')
     except Exception as e:
-        print(e)
         return render_template('editar.html')
 
 
@@ -531,11 +516,9 @@ def agregar():
                     flash(i)
             except Exception as e:
                 flash(e)
-                print(e)
             try:
                 crear = request.form['crear']
                 if len(crear) >= 3:
-                    print(crear)
                     db.execute(
                         'INSERT INTO habitaciones (habitacion,estado) VALUES(?,?)', (crear, "Disponible"))
                     db.commit()
@@ -545,11 +528,9 @@ def agregar():
                           category='success')
                     return render_template('agregar.html', exito=exito)
             except Exception as e:
-                print(e)
                 return render_template('agregar.html')
         return render_template('agregar.html', exito=exito)
     except Exception as e:
-        print(e)
         return render_template('agregar.html', exito=exito)
 
 
@@ -567,18 +548,15 @@ def eliminar():
                     flash(i)
             except Exception as e:
                 flash(e)
-                print(e)
 
             try:
                 terminos = request.form['confirma']
             except Exception as e:
-                print("Debe aceptar los términos y condiciones antes de avanzar")
                 return render_template("eliminar.html")
 
             try:
                 eliminar = request.form['eliminar']
                 if len(eliminar) >= 3:
-                    print(eliminar)
                     db.execute(
                         'DELETE FROM habitaciones WHERE habitacion = ?', (eliminar,))
                     db.commit()
@@ -589,10 +567,8 @@ def eliminar():
                     return render_template('eliminar.html', exito=exito)
             except Exception as e:
                 exito = False
-                print(e)
                 return render_template('eliminar.html', exito=exito)
     except Exception as e:
-        print(e)
         return render_template('eliminar.html')
     return render_template('eliminar.html')
 
