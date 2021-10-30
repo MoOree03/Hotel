@@ -12,48 +12,23 @@
           <div class="u-size-30">
             <div class="u-layout-row">
               <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-1">
+                {% if nombre %}
+                {% with nombre = nombre %}
+                {% with fecha = fecha %}
+                {% with comentarios = comentarios %}
+                {% for i in range(len(nombre))%}
                 <div class="u-container-layout u-container-layout-1">
                   <div class="u-image u-image-circle u-image-1" alt="" data-image-width="1280" data-image-height="853">
                   </div>
-                  <h3 class="u-text u-text-default u-text-2">Titular de muestra</h3>
-                  <h5 class="u-text u-text-default u-text-3">Titular de muestra</h5>
-                  <p class="u-text u-text-4">Texto de ejemplo. Lorem ipsum dolor sit amet, consectetur adipiscing elit
-                    nullam nunc justo sagittis suscipit ultrices.</p>
+                  <h3 class="u-text u-text-default u-text-2">{{nombre[i]}}</h3>
+                  <h5 class="u-text u-text-default u-text-3">{{fecha[i]}}</h5>
+                  <p class="u-text u-text-4">{{comentarios[i]}}</p>
                 </div>
-              </div>
-              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-2">
-                <div class="u-container-layout u-container-layout-2">
-                  <div class="u-image u-image-circle u-image-2" alt="" data-image-width="1280" data-image-height="853">
-                  </div>
-                  <h3 class="u-text u-text-default u-text-5">Titular de muestra</h3>
-                  <h5 class="u-text u-text-default u-text-6">Titular de muestra</h5>
-                  <p class="u-text u-text-7">Texto de ejemplo. Lorem ipsum dolor sit amet, consectetur adipiscing elit
-                    nullam nunc justo sagittis suscipit ultrices.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="u-size-30">
-            <div class="u-layout-row">
-              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-3">
-                <div class="u-container-layout u-container-layout-3">
-                  <div class="u-image u-image-circle u-image-3" alt="" data-image-width="1280" data-image-height="853">
-                  </div>
-                  <h3 class="u-text u-text-default u-text-8">Titular de muestra</h3>
-                  <h5 class="u-text u-text-default u-text-9">Titular de muestra</h5>
-                  <p class="u-text u-text-10">Texto de ejemplo. Lorem ipsum dolor sit amet, consectetur adipiscing
-                    elit nullam nunc justo sagittis suscipit ultrices.</p>
-                </div>
-              </div>
-              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-4">
-                <div class="u-container-layout u-container-layout-4">
-                  <div class="u-image u-image-circle u-image-4" alt="" data-image-width="1280" data-image-height="853">
-                  </div>
-                  <h3 class="u-text u-text-default u-text-11">Titular de muestra</h3>
-                  <h5 class="u-text u-text-default u-text-12">Titular de muestra</h5>
-                  <p class="u-text u-text-13">Texto de ejemplo. Lorem ipsum dolor sit amet, consectetur adipiscing
-                    elit nullam nunc justo sagittis suscipit ultrices.</p>
-                </div>
+                {% endfor%}
+                {% endwith %}
+                {% endwith %}
+                {% endwith %}
+                {% endif %}
               </div>
             </div>
           </div>

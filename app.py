@@ -1,4 +1,6 @@
+
 import re
+from sqlite3.dbapi2 import enable_callback_tracebacks
 from flask import Flask, render_template, request, flash, redirect, url_for, session,\
     g
 import yagmail
@@ -22,7 +24,7 @@ tema_reserva = 'Recibo de su reserva'
 
 tema_recupera = '¿Olvidaste tu contraseña'
 recupera_contenido = [
-    'Para restablecer tu contraseña da click en en siguiente enlace\n'
+    'Para restablecer tu contraseña da click en el siguiente enlace\n'
     'ENLACE'
 ]
 
@@ -62,6 +64,9 @@ def iniciar():
             db = get_db()
             user = db.execute(
                 'SELECT * FROM usuarios WHERE Nombre= ?', (username, )).fetchone()
+
+            lista = db.execute(
+                'SELECT habitacion FROM habitaciones WHERE estado = "Disponible" ').fetchall()
             db.close()
             if user is None:
                 error = 'Usuario o contraseña inválidos'
@@ -83,7 +88,7 @@ def iniciar():
             if adminL == 'Admin':
                 admin = True
             inicioS = True
-            return render_template('reserva.html', inicioS=inicioS)
+            return redirect(url_for('reserva'))
         return render_template('iniciar.html', inicioS=inicioS)
     except Exception as ex:
         print(ex)
@@ -254,13 +259,42 @@ def recuperar():
 
 @app.route('/habitacion', methods=['GET'])
 def habitacion():
-    # Crear un buscador para filtrar habitaciones por nombre
+    try:
+        db = get_db()
+        nombre = db.execute(
+            'SELECT id_Usuario FROM Comentarios ').fetchall()
+        fecha = db.execute(
+            'SELECT id_llegada FROM Comentarios').fetchall()
+        comentarios = db.execute(
+            'SELECT Comentario FROM Comentarios').fetchall()
+        db.commit()
+        db.close()
+        for i in nombre:
+            print(i)
+        for i in fecha:
+            print(i)
+        for i in comentarios:
+            print(i)
+        return render_template('habitacion.html', inicioS=inicioS, nombre=nombre, fecha=fecha, comentarios=comentarios)
+    except Exception as e:
+        print("")
     return render_template('habitacion.html', inicioS=inicioS)
 
 
 @app.route('/reserva', methods=['POST', 'GET'])
 @login_required
 def reserva():
+    db = get_db()
+    lista = db.execute(
+        'SELECT habitacion FROM habitaciones WHERE estado = "Disponible"').fetchall()
+    listaN = db.execute(
+        'SELECT habitacion FROM habitaciones').fetchall()
+    listaA = db.execute(
+        'SELECT habitacion FROM habitaciones').fetchall()
+    if len(listaN)==len(listaA):
+        flash ("No hay habitaciones disponibles, intente más tarde")
+        return render_template("reserva.html",inicioS=inicioS,lista=lista)
+    
     try:
         if request.method == 'POST':
             llegada = request.form['llegada']
@@ -269,30 +303,38 @@ def reserva():
             numero = request.form['numero']
             error = None
             exito = False
-
+            habitacion = habitacion.replace('(', '')
+            habitacion = habitacion.replace(')', '')
+            habitacion = habitacion.replace("'", "")
+            habitacion = habitacion.replace(',', '')
+            print(habitacion)
             try:
                 terminos = request.form['terminos']
             except Exception as e:
                 e = "Debe aceptar los terminos y condiciones antes de avanzar"
                 flash(e)
-                return render_template("reserva.html")
-            db = get_db()
+                return render_template("reserva.html",lista=lista)
             disponibilidad = db.execute(
-                'SELECT estado FROM habitaciones WHERE habitacion=?', (habitacion,)).fetchone()
+                'SELECT estado FROM habitaciones WHERE habitacion= :habitacion', {"habitacion": habitacion}).fetchone()
+
             user_email = db.execute(
                 'SELECT Email FROM usuarios WHERE id=?', (session.get('user_id'),)).fetchone()
             habita = db.execute(
-                'SELECT Habitacion FROM Habitaciones WHERE Habitacion=?', (habitacion,)).fetchone()
+                'SELECT habitacion FROM habitaciones WHERE habitacion= ?', (habitacion,)).fetchone()
+
             if disponibilidad == ('Ocupada',):
                 error = 'Habitación ocupada, seleccione otra'.format(
                     disponibilidad)
                 flash(error)
-                return render_template('reserva.html')
+                return render_template('reserva.html',lista=lista)
+
             try:
+
                 db.execute('INSERT INTO Reservas (Llegada,Salida,id_Habitacion,NumeroPersonas,id_usuario) VALUES (?,?,?,?,?)',
                            (llegada, salida, habitacion, numero, session.get('user_id')))
+
                 db.execute(
-                    'UPDATE habitaciones SET estado = "Ocupada" WHERE habitaciones.habitacion =?', (habita))
+                    'UPDATE habitaciones SET estado = "Ocupada" WHERE habitacion =?', (habita))
                 db.commit()
                 db.close()
                 exito = True
@@ -303,16 +345,19 @@ def reserva():
                          contents=contenido)
             except Exception as e:
                 flash(e)
-                print(e)
-            return render_template('reserva.html', inicioS=inicioS, exito=exito)
-        return render_template('reserva.html', inicioS=inicioS)
+            return render_template('reserva.html', inicioS=inicioS, exito=exito, lista=lista)
+        return render_template('reserva.html', inicioS=inicioS, lista=lista)
     except Exception as e:
-        return render_template('reserva.html', inicioS=inicioS)
+        print(e)
+        return render_template('reserva.html', inicioS=inicioS,lista=lista)
 
 
 @app.route('/calificacion', methods=['GET', 'POST'])
 @login_required
 def calificacion():
+    db = get_db()
+    lista = db.execute(
+        'SELECT habitacion FROM habitaciones WHERE estado = "Disponible" ').fetchall()
     try:
         if request.method == 'POST':
             limpieza = request.form['limpieza']
@@ -323,32 +368,51 @@ def calificacion():
             exito = False
             promedio = float((int(limpieza) + int(atencion) +
                              int(conectividad) + int(servicio)))/4
-            print(promedio)
-            db = get_db()
             id_user = session.get('user_id')
-            print(id_user)
             try:
                 numero = db.execute(
                     'SELECT * FROM Reservas WHERE id_usuario= ?', (id_user,)).fetchone()
+                nombre = db.execute(
+                    'SELECT Nombre FROM usuarios WHERE id=?', (id_user,)).fetchone()
+                llegada = db.execute(
+                    'SELECT llegada FROM Reservas WHERE id_usuario= ?', (id_user,)).fetchone()
+                nombre=str(nombre)
+                llegada=str(llegada)
                 id_hab = numero[3]
-                db.execute('INSERT INTO Comentarios (Calificacion,Comentario,id_Usuario,id_Habitacion) VALUES (?,?,?,?)',
-                           (promedio, comentario, session.get('user_id'), id_hab))
+                db.execute('INSERT INTO Comentarios (Calificacion,Comentario,id_Usuario,id_Habitacion,id_llegada) VALUES (?,?,?,?,?)',
+                           (promedio, comentario, nombre, id_hab, llegada))
                 db.commit()
                 db.close()
                 exito = True
                 flash("Gracias por comentar su experiencia!")
             except Exception as e:
+                flash(e)
                 flash("Primero debes reservar una habitación")
-                print(e)
+                print("Aqui")
+                return render_template('reserva.html', inicioS=inicioS, exito=exito, lista=lista)
             return render_template('calificacion.html', inicioS=inicioS, exito=exito)
         return render_template('calificacion.html', inicioS=inicioS)
     except Exception as e:
         print(e)
+        print("Aqui2")
         return render_template('calificacion.html', inicioS=inicioS)
 
 
 @app.route('/comentarios', methods=['GET'])
 def comentarios():
+    try:
+        db = get_db()
+        nombre = db.execute(
+            'SELECT Nombre FROM usuarios').fetchall()
+        fecha = db.execute(
+            'SELECT Llegada FROM Reservas').fetchall()
+        comentarios = db.execute(
+            'SELECT Comentario FROM Comentarios').fetchall()
+        db.commit()
+        db.close()
+        return render_template('comentarios.html', inicioS=inicioS, nombre=nombre, fecha=fecha, comentarios=comentarios)
+    except Exception as e:
+        print(e)
     return render_template('comentarios.html', inicioS=inicioS)
 
 

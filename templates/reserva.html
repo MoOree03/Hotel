@@ -38,10 +38,14 @@
               <label for="habi" class="u-label">Habitación</label>
               <div class="u-form-select-wrapper">
                 <select id="habi" name="habi" class="u-border-1 u-border-grey-30 u-input u-input-rectangle u-white">
-                  <option value="001">001</option>
-                  <option value="002">002</option>
-                  <option value="003">003</option>
-                  <option value="004">004</option>
+                  {% if lista %}
+                  {% for i in lista %}
+                  <option value="{{i}}">{{i}}</option>
+                  {% endfor %}
+                  {% endif %}
+                  {% if not lista %}
+                  <option value="carga" class="text-danger">¡No hay habitaciones disponibles!</option>
+                  {% endif %}
                 </select>
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="12" version="1" class="u-caret">
                   <path fill="currentColor" d="M4 8L0 4h8z"></path>
