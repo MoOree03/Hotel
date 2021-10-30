@@ -7,35 +7,31 @@
   <div class="u-clearfix u-sheet u-sheet-1">
     <h1 class="u-text u-text-default u-title u-text-1">¡Cuenta tu experiencia!</h1>
     <div class="u-clearfix u-expanded-width u-layout-wrap u-layout-wrap-1">
-      <div class="u-layout">
-        <div class="u-layout-col">
-          <div class="u-size-30">
-            <div class="u-layout-row">
-              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-1">
-                {% if nombre %}
-                {% with nombre = nombre %}
-                {% with fecha = fecha %}
-                {% with comentarios = comentarios %}
-                {% for i in range(len(nombre))%}
-                <div class="u-container-layout u-container-layout-1">
-                  <div class="u-image u-image-circle u-image-1" alt="" data-image-width="1280" data-image-height="853">
-                  </div>
-                  <h3 class="u-text u-text-default u-text-2">{{nombre[i]}}</h3>
-                  <h5 class="u-text u-text-default u-text-3">{{fecha[i]}}</h5>
-                  <p class="u-text u-text-4">{{comentarios[i]}}</p>
-                </div>
-                {% endfor%}
-                {% endwith %}
-                {% endwith %}
-                {% endwith %}
-                {% endif %}
-              </div>
+      {% if nombre %}
+      {% with nombre = nombre %}
+      {% with fecha = fecha %}
+      {% with comentarios = comentarios %}
+      <div class="row">
+        {% for i in range(tamano)%}
+        <div class="col-4">
+          <div class="u-container-layout u-container-layout-1">
+            <div class="u-image u-image-circle u-image-1" alt="" data-image-width="1280" data-image-height="853">
             </div>
+            <h3 class="u-text u-text-default u-text-2">{{nombre[i]}}</h3>
+            <h5 class="u-text u-text-default u-text-3">{{fecha[i]}}</h5>
+            <p class="u-text u-text-4">{{comentarios[i]}}</p>
           </div>
         </div>
+        {% endfor%}
       </div>
     </div>
-    <a href="calificacion" data-page-id="278110038" class="u-border-none u-btn u-button-style u-btn-1">Comentar</a>
+    {% endwith %}
+    {% endwith %}
+    {% endwith %}
+    {% endif %}
+  </div>
+  </div>
+  <a href="calificacion" data-page-id="278110038" class="u-border-none u-btn u-button-style u-btn-1">Comentar</a>
   </div>
 </section>
 {% endblock %}

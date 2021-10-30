@@ -259,25 +259,6 @@ def recuperar():
 
 @app.route('/habitacion', methods=['GET'])
 def habitacion():
-    try:
-        db = get_db()
-        nombre = db.execute(
-            'SELECT id_Usuario FROM Comentarios ').fetchall()
-        fecha = db.execute(
-            'SELECT id_llegada FROM Comentarios').fetchall()
-        comentarios = db.execute(
-            'SELECT Comentario FROM Comentarios').fetchall()
-        db.commit()
-        db.close()
-        for i in nombre:
-            print(i)
-        for i in fecha:
-            print(i)
-        for i in comentarios:
-            print(i)
-        return render_template('habitacion.html', inicioS=inicioS, nombre=nombre, fecha=fecha, comentarios=comentarios)
-    except Exception as e:
-        print("")
     return render_template('habitacion.html', inicioS=inicioS)
 
 
@@ -290,7 +271,7 @@ def reserva():
     listaN = db.execute(
         'SELECT habitacion FROM habitaciones').fetchall()
     listaA = db.execute(
-        'SELECT habitacion FROM habitaciones').fetchall()
+        'SELECT habitacion FROM habitaciones WHERE estado="Ocupado"').fetchall()
     if len(listaN)==len(listaA):
         flash ("No hay habitaciones disponibles, intente más tarde")
         return render_template("reserva.html",inicioS=inicioS,lista=lista)
@@ -386,7 +367,6 @@ def calificacion():
                 exito = True
                 flash("Gracias por comentar su experiencia!")
             except Exception as e:
-                flash(e)
                 flash("Primero debes reservar una habitación")
                 print("Aqui")
                 return render_template('reserva.html', inicioS=inicioS, exito=exito, lista=lista)
@@ -402,16 +382,38 @@ def calificacion():
 def comentarios():
     try:
         db = get_db()
+        print("a")
         nombre = db.execute(
-            'SELECT Nombre FROM usuarios').fetchall()
+            'SELECT id_Usuario FROM Comentarios').fetchall()
         fecha = db.execute(
-            'SELECT Llegada FROM Reservas').fetchall()
+            'SELECT id_llegada FROM Comentarios').fetchall()
         comentarios = db.execute(
             'SELECT Comentario FROM Comentarios').fetchall()
+        tamano = len(comentarios)  
+        for i in range(len(nombre)):
+            nombre[i]=str(nombre[i]).replace('(','')
+            nombre[i]=str(nombre[i]).replace(')','')
+            nombre[i]=str(nombre[i]).replace("'","")
+            nombre[i]=str(nombre[i]).replace(",","")
+            nombre[i]=str(nombre[i]).replace('"','')
+        for i in range(len(fecha)):
+            fecha[i]=str(fecha[i]).replace('(','')
+            fecha[i]=str(fecha[i]).replace(')','')
+            fecha[i]=str(fecha[i]).replace("'","")
+            fecha[i]=str(fecha[i]).replace(",","")
+            fecha[i]=str(fecha[i]).replace('"','')
+        for i in range(len(comentarios)):
+            comentarios[i]=str(comentarios[i]).replace('(','')
+            comentarios[i]=str(comentarios[i]).replace(')','')
+            comentarios[i]=str(comentarios[i]).replace("'","")
+            comentarios[i]=str(comentarios[i]).replace(",","")
+            comentarios[i]=str(comentarios[i]).replace('"','')
+        
         db.commit()
         db.close()
-        return render_template('comentarios.html', inicioS=inicioS, nombre=nombre, fecha=fecha, comentarios=comentarios)
+        return render_template('comentarios.html', inicioS=inicioS, nombre=nombre, fecha=fecha, comentarios=comentarios,tamano=tamano)
     except Exception as e:
+        flash(e)
         print(e)
     return render_template('comentarios.html', inicioS=inicioS)
 
