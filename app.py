@@ -1,6 +1,3 @@
-
-import re
-from sqlite3.dbapi2 import enable_callback_tracebacks
 from flask import Flask, render_template, request, flash, redirect, url_for, session,\
     g
 import yagmail
@@ -215,7 +212,6 @@ def registro():
                 db.close()
                 yag.send(to=email, subject=tema_registro,
                          contents=contenido_registro)
-                print("Guarda")
                 exito = True
                 render_template('registro.html')
             except Exception as e:
@@ -368,13 +364,11 @@ def calificacion():
                 flash("Gracias por comentar su experiencia!")
             except Exception as e:
                 flash("Primero debes reservar una habitación")
-                print("Aqui")
                 return render_template('reserva.html', inicioS=inicioS, exito=exito, lista=lista)
             return render_template('calificacion.html', inicioS=inicioS, exito=exito)
         return render_template('calificacion.html', inicioS=inicioS)
     except Exception as e:
         print(e)
-        print("Aqui2")
         return render_template('calificacion.html', inicioS=inicioS)
 
 
@@ -382,7 +376,6 @@ def calificacion():
 def comentarios():
     try:
         db = get_db()
-        print("a")
         nombre = db.execute(
             'SELECT id_Usuario FROM Comentarios').fetchall()
         fecha = db.execute(
@@ -448,12 +441,10 @@ def gestion():
             try:
                 terminos = request.form['terminos']
             except Exception as e:
-                print("Debe aceptar los términos y condiciones antes de avanzar")
                 return render_template('gestion.html')
 
             try:
                 eliminar = request.form['eliminar']
-                print(eliminar)
                 db.execute(
                     'DELETE FROM Comentarios WHERE id_Usuario = ?', (eliminar,))
                 db.commit()
@@ -490,42 +481,34 @@ def editar():
             except Exception as e:
                 flash(e)
                 print(e)
-            print("entra")
             try:
                 db = get_db()
                 id_habitacion = request.form['id']
                 id_habi = db.execute('SELECT habitacion FROM habitaciones WHERE habitacion = :id', {
                                      "id": id_habitacion}).fetchone()
                 nombre = request.form['nombre']
-                print(nombre)
-                print(id_habi[0])
-                print(type(id_habi))
 
                 if len(nombre) >= 3:
                     db.execute(
                         'UPDATE habitaciones SET habitacion = :nombre WHERE habitacion = :id', {"nombre": nombre, "id": id_habi[0]})
-                    print("Funciona")
                     db.commit()
                     flash("Se realizo la edición de la habitación",
                           category='success')
                     return render_template('editar.html')
             except Exception as e:
                 print(e)
-                print("Valio")
                 return render_template('editar.html')
             try:
                 db = get_db()
                 disponibilidad = request.form['disponibilidad']
                 db.execute(
                     'UPDATE habitaciones SET estado = :estado WHERE habitacion = :id', {"estado": disponibilidad, "id": id_habi[0]})
-                print("Funciona")
                 db.commit()
                 db.close()
                 flash("Se realizo la edición de la habitación", category='success')
                 return render_template('editar.html')
             except Exception as e:
                 print(e)
-                print("Valio")
                 return render_template('editar.html')
         return render_template('editar.html')
     except Exception as e:
@@ -549,7 +532,6 @@ def agregar():
             except Exception as e:
                 flash(e)
                 print(e)
-            print("entra")
             try:
                 crear = request.form['crear']
                 if len(crear) >= 3:
