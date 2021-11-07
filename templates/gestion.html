@@ -59,10 +59,10 @@
   </div>
 </section>
 {% with messages = get_flashed_messages(category_filter=["success"]) %}
-  {% if messages %}
-  {%for message in messages %}
-  <div class="alert alert-success text-center">{{message}}</div>
-  {% endfor%}
-  {% endif %}
-  {% endwith %}
+{% if messages %}
+{%for message in messages %}
+<div class="alert alert-success text-center">{{message}}</div>
+{% endfor%}
+{% endif %}
+{% endwith %}
 {% endblock %}

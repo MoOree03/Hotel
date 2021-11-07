@@ -2,6 +2,7 @@ import sqlite3
 from sqlite3 import Error
 from flask import g
 
+
 def get_db():
     try:
         if 'db' not in g:

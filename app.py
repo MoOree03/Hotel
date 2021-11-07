@@ -30,7 +30,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom(12)
 inicioS = False
 admin = False
-superAdmin= False
+superAdmin = False
 
 
 @app.route('/', methods=['GET'])
@@ -106,11 +106,12 @@ def admin_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None or admin == False:
-            if superAdmin==True:
+            if superAdmin == True:
                 return view(**kwargs)
             return redirect(url_for('inicio'))
         return view(**kwargs)
     return wrapped_view
+
 
 def super_required(view):
     @functools.wraps(view)
@@ -120,6 +121,7 @@ def super_required(view):
         return view(**kwargs)
     return wrapped_view
 
+
 @app.route('/salir')
 def salir():
     global inicioS
@@ -127,7 +129,7 @@ def salir():
     global superAdmin
     inicioS = False
     admin = False
-    superAdmin=False
+    superAdmin = False
     session.clear()
     return redirect(url_for('inicio'))
 
@@ -277,10 +279,10 @@ def reserva():
         'SELECT habitacion FROM habitaciones').fetchall()
     listaA = db.execute(
         'SELECT habitacion FROM habitaciones WHERE estado="Ocupado"').fetchall()
-    if len(listaN)==len(listaA):
-        flash ("No hay habitaciones disponibles, intente más tarde")
-        return render_template("reserva.html",inicioS=inicioS,lista=lista)
-    
+    if len(listaN) == len(listaA):
+        flash("No hay habitaciones disponibles, intente más tarde")
+        return render_template("reserva.html", inicioS=inicioS, lista=lista)
+
     try:
         if request.method == 'POST':
             llegada = request.form['llegada']
@@ -298,7 +300,7 @@ def reserva():
             except Exception as e:
                 e = "Debe aceptar los terminos y condiciones antes de avanzar"
                 flash(e)
-                return render_template("reserva.html",lista=lista)
+                return render_template("reserva.html", lista=lista)
             disponibilidad = db.execute(
                 'SELECT estado FROM habitaciones WHERE habitacion= :habitacion', {"habitacion": habitacion}).fetchone()
 
@@ -311,7 +313,7 @@ def reserva():
                 error = 'Habitación ocupada, seleccione otra'.format(
                     disponibilidad)
                 flash(error)
-                return render_template('reserva.html',lista=lista)
+                return render_template('reserva.html', lista=lista)
 
             try:
 
@@ -333,7 +335,7 @@ def reserva():
             return render_template('reserva.html', inicioS=inicioS, exito=exito, lista=lista)
         return render_template('reserva.html', inicioS=inicioS, lista=lista)
     except Exception as e:
-        return render_template('reserva.html', inicioS=inicioS,lista=lista)
+        return render_template('reserva.html', inicioS=inicioS, lista=lista)
 
 
 @app.route('/calificacion', methods=['GET', 'POST'])
@@ -360,8 +362,8 @@ def calificacion():
                     'SELECT Nombre FROM usuarios WHERE id=?', (id_user,)).fetchone()
                 llegada = db.execute(
                     'SELECT llegada FROM Reservas WHERE id_usuario= ?', (id_user,)).fetchone()
-                nombre=str(nombre)
-                llegada=str(llegada)
+                nombre = str(nombre)
+                llegada = str(llegada)
                 id_hab = numero[3]
                 db.execute('INSERT INTO Comentarios (Calificacion,Comentario,id_Usuario,id_Habitacion,id_llegada) VALUES (?,?,?,?,?)',
                            (promedio, comentario, nombre, id_hab, llegada))
@@ -388,29 +390,29 @@ def comentarios():
             'SELECT id_llegada FROM Comentarios').fetchall()
         comentarios = db.execute(
             'SELECT Comentario FROM Comentarios').fetchall()
-        tamano = len(comentarios)  
+        tamano = len(comentarios)
         for i in range(len(nombre)):
-            nombre[i]=str(nombre[i]).replace('(','')
-            nombre[i]=str(nombre[i]).replace(')','')
-            nombre[i]=str(nombre[i]).replace("'","")
-            nombre[i]=str(nombre[i]).replace(",","")
-            nombre[i]=str(nombre[i]).replace('"','')
+            nombre[i] = str(nombre[i]).replace('(', '')
+            nombre[i] = str(nombre[i]).replace(')', '')
+            nombre[i] = str(nombre[i]).replace("'", "")
+            nombre[i] = str(nombre[i]).replace(",", "")
+            nombre[i] = str(nombre[i]).replace('"', '')
         for i in range(len(fecha)):
-            fecha[i]=str(fecha[i]).replace('(','')
-            fecha[i]=str(fecha[i]).replace(')','')
-            fecha[i]=str(fecha[i]).replace("'","")
-            fecha[i]=str(fecha[i]).replace(",","")
-            fecha[i]=str(fecha[i]).replace('"','')
+            fecha[i] = str(fecha[i]).replace('(', '')
+            fecha[i] = str(fecha[i]).replace(')', '')
+            fecha[i] = str(fecha[i]).replace("'", "")
+            fecha[i] = str(fecha[i]).replace(",", "")
+            fecha[i] = str(fecha[i]).replace('"', '')
         for i in range(len(comentarios)):
-            comentarios[i]=str(comentarios[i]).replace('(','')
-            comentarios[i]=str(comentarios[i]).replace(')','')
-            comentarios[i]=str(comentarios[i]).replace("'","")
-            comentarios[i]=str(comentarios[i]).replace(",","")
-            comentarios[i]=str(comentarios[i]).replace('"','')
-        
+            comentarios[i] = str(comentarios[i]).replace('(', '')
+            comentarios[i] = str(comentarios[i]).replace(')', '')
+            comentarios[i] = str(comentarios[i]).replace("'", "")
+            comentarios[i] = str(comentarios[i]).replace(",", "")
+            comentarios[i] = str(comentarios[i]).replace('"', '')
+
         db.commit()
         db.close()
-        return render_template('comentarios.html', inicioS=inicioS, nombre=nombre, fecha=fecha, comentarios=comentarios,tamano=tamano)
+        return render_template('comentarios.html', inicioS=inicioS, nombre=nombre, fecha=fecha, comentarios=comentarios, tamano=tamano)
     except Exception as e:
         flash(e)
     return render_template('comentarios.html', inicioS=inicioS)
@@ -419,7 +421,7 @@ def comentarios():
 @app.route('/herramientas', methods=['GET'])
 @admin_required
 def herramienta():
-    return render_template('herramientas.html',superAdmin=superAdmin)
+    return render_template('herramientas.html', superAdmin=superAdmin)
 
 
 @app.route('/gestion', methods=['POST', 'GET'])
@@ -448,7 +450,7 @@ def gestion():
                 db.close()
                 flash("El comentario fue eliminado exitosamente",
                       category='success')
-                
+
                 return render_template('gestion.html')
             except Exception as e:
                 return render_template('gestion.html')
@@ -467,10 +469,10 @@ def editar():
                 db = get_db()
                 habitaciones = db.execute(
                     'SELECT habitacion,estado FROM habitaciones').fetchall()
-                
+
                 for i in habitaciones:
                     flash(i, category='info')
-                
+
             except Exception as e:
                 flash(e)
             try:
@@ -549,11 +551,9 @@ def eliminar():
                 habitaciones = db.execute(
                     'SELECT habitacion FROM habitaciones').fetchall()
                 for i in habitaciones:
-                    flash(i,category="info")
+                    flash(i, category="info")
             except Exception as e:
                 flash(e)
-
-            
 
             try:
                 eliminar = request.form['eliminar']
@@ -566,12 +566,12 @@ def eliminar():
                     try:
                         terminos = request.form['confirma']
                     except Exception as e:
-                        flash("Debe confirmar eliminación",category="error")
+                        flash("Debe confirmar eliminación", category="error")
                         return render_template("eliminar.html")
                     flash("La habitación fue eliminada exitosamente",
                           category='success')
                     return render_template('eliminar.html', exito=exito)
-                flash("Debe ingresar habitación a eliminar",category="error")
+                flash("Debe ingresar habitación a eliminar", category="error")
                 return render_template('eliminar.html', exito=exito)
             except Exception as e:
                 exito = False
@@ -580,9 +580,10 @@ def eliminar():
         return render_template('eliminar.html')
     return render_template('eliminar.html')
 
-@app.route('/superUser', methods=['GET','POST'])
+
+@app.route('/superUser', methods=['GET', 'POST'])
 @super_required
-def superUser ():
+def superUser():
     db = get_db()
     try:
         if request.method == 'POST':
@@ -597,29 +598,28 @@ def superUser ():
                 return render_template('superUser.html')
             try:
                 id_seleccionado = request.form['id']
-                while len(id_seleccionado) <1 :
+                while len(id_seleccionado) < 1:
                     id_seleccionado = request.form['id']
-                    flash("Debe ingresar el id de usuario",category="error")
+                    flash("Debe ingresar el id de usuario", category="error")
                     return render_template('superUser.html')
                 nuevo = request.form['nuevo']
-                if(len(nuevo)>0):
+                if(len(nuevo) > 0):
                     db.execute(
-                        'UPDATE usuarios SET Nombre = :nombre WHERE id = :id', {"nombre": nuevo, "id":id_seleccionado})
+                        'UPDATE usuarios SET Nombre = :nombre WHERE id = :id', {"nombre": nuevo, "id": id_seleccionado})
                     db.commit()
                     flash("Se realizo la edicion del nombre de usuario",
-                            category='success')
+                          category='success')
                     return render_template('superUser.html')
             except Exception as e:
                 print("")
-                
-                
+
             try:
-                
+
                 rol = request.form['estado']
                 db.execute(
-                    'UPDATE usuarios SET rol = :estado WHERE id = :id', {"estado": rol, "id":id_seleccionado})
+                    'UPDATE usuarios SET rol = :estado WHERE id = :id', {"estado": rol, "id": id_seleccionado})
                 db.commit()
-                
+
                 flash("Se realizo la edición del rol", category='success')
                 return render_template('superUser.html')
             except Exception as e:
@@ -629,10 +629,10 @@ def superUser ():
                 print("a")
                 eliminar = request.form['eliminar']
                 print("a")
-                while len(eliminar) <1 :
+                while len(eliminar) < 1:
                     eliminar = request.form['eliminar']
                     print("b")
-                    flash("Debe ingresar el id de usuario",category="error")
+                    flash("Debe ingresar el id de usuario", category="error")
                     return render_template('superUser.html')
                 db.execute(
                     'DELETE FROM usuarios WHERE id = ?', (eliminar,))
@@ -641,7 +641,7 @@ def superUser ():
                     terminos = request.form['confirmar']
                 except Exception as e:
                     print(e)
-                    flash("Debe confirmar eliminación",category="error")
+                    flash("Debe confirmar eliminación", category="error")
                     return render_template("superUser.html")
                 flash("Se realizo la eliminación del usuario", category='success')
                 return render_template('superUser.html')
@@ -652,7 +652,7 @@ def superUser ():
     except Exception as e:
         print(e)
         return render_template('superUser.html')
-    
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000)

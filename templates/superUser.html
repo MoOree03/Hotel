@@ -10,9 +10,8 @@
         <h2 class="u-text u-text-default u-text-1">Gestor de Usuarios</h2>
         <div class="u-border-3 u-border-grey-dark-1 u-line u-line-horizontal u-line-1"></div>
         <div class="u-form u-form-1">
-          <form action="{{url_for('superUser')}}" method="POST"
-            class="u-clearfix u-form-spacing-15  u-inner-form" style="padding: 15px;" source="custom"
-            name="form">
+          <form action="{{url_for('superUser')}}" method="POST" class="u-clearfix u-form-spacing-15  u-inner-form"
+            style="padding: 15px;" source="custom" name="form">
             <div class="u-form-group u-form-group-2">
               <label for="rol" class="u-label">id-Nombre-Rol</label>
               <textarea rows="5" cols="50" id="rol" name="rol"
@@ -34,9 +33,8 @@
           </form>
         </div>
         <div class="u-form u-form-2">
-          <form action="{{url_for('superUser')}}" method="POST"
-            class="u-clearfix u-form-spacing-15  u-inner-form" style="padding: 15px;" source="custom"
-            name="form">
+          <form action="{{url_for('superUser')}}" method="POST" class="u-clearfix u-form-spacing-15  u-inner-form"
+            style="padding: 15px;" source="custom" name="form">
             <div class="u-form-group u-form-group-4">
               <label for="id" class="u-form-control-hidden u-label"></label>
               <input type="text" placeholder="Identificador de usuario" id="id" name="id"
@@ -50,8 +48,7 @@
             <div class="u-form-group u-form-select u-form-group-6">
               <label for="estado" class="u-label">Rol</label>
               <div class="u-form-select-wrapper">
-                <select id="estado" name="estado"
-                  class="u-border-1 u-border-grey-30 u-input u-input-rectangle">
+                <select id="estado" name="estado" class="u-border-1 u-border-grey-30 u-input u-input-rectangle">
                   <option value="Admin">Admin</option>
                   <option value="Usuario">Usuario</option>
                 </select>
@@ -68,9 +65,8 @@
           </form>
         </div>
         <div class="u-form u-form-3">
-          <form action="{{url_for('superUser')}}" method="POST"
-            class="u-clearfix u-form-spacing-15  u-inner-form" style="padding: 15px;" source="custom"
-            name="form">
+          <form action="{{url_for('superUser')}}" method="POST" class="u-clearfix u-form-spacing-15  u-inner-form"
+            style="padding: 15px;" source="custom" name="form">
             <div class="u-form-group u-form-group-8">
               <label for="eliminar" class="u-label">Usuario a eliminar</label>
               <input type="text" placeholder="Identificador de usuario" id="eliminar" name="eliminar"
@@ -92,17 +88,17 @@
   </div>
 </section>
 {% with messages = get_flashed_messages(category_filter=["error"]) %}
-  {% if messages %}
-  {%for message in messages %}
-  <div class="alert alert-danger text-center">{{message}}</div>
-  {% endfor%}
-  {% endif %}
-  {% endwith %}
+{% if messages %}
+{%for message in messages %}
+<div class="alert alert-danger text-center">{{message}}</div>
+{% endfor%}
+{% endif %}
+{% endwith %}
 {% with messages = get_flashed_messages(category_filter=["success"]) %}
-  {% if messages %}
-  {%for message in messages %}
-  <div class="alert alert-success text-center">{{message}}</div>
-  {% endfor%}
-  {% endif %}
-  {% endwith %}
+{% if messages %}
+{%for message in messages %}
+<div class="alert alert-success text-center">{{message}}</div>
+{% endfor%}
+{% endif %}
+{% endwith %}
 {% endblock %}
