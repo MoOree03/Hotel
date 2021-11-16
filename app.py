@@ -37,7 +37,7 @@ superAdmin = False
 def inicio():
     # Si inicio sesion -> Mostrar bienvenida, y cambio de navbar
     # Sino -> mantener rol de visitante
-    return render_template('index.html', inicioS=inicioS)
+    return render_template('index.html', inicioS=inicioS,superAdmin=superAdmin, admin=admin)
 
 
 @app.route('/iniciar', methods=['POST', 'GET'])
@@ -88,7 +88,7 @@ def iniciar():
                 superAdmin = True
             inicioS = True
             return redirect(url_for('reserva'))
-        return render_template('iniciar.html', inicioS=inicioS)
+        return render_template('iniciar.html', inicioS=inicioS,superAdmin=superAdmin, admin=admin)
     except Exception as e:
         return render_template('iniciar.html')
 
@@ -258,15 +258,15 @@ def recuperar():
             flash('Hemos enviado un mensaje a su correo')
             yag.send(to=email, subject=tema_recupera,
                      contents=recupera_contenido)
-            return render_template('recuperar.html', inicioS=inicioS, exito=exito)
-        return render_template('recuperar.html', inicioS=inicioS)
+            return render_template('recuperar.html', inicioS=inicioS, exito=exito,superAdmin=superAdmin, admin=admin)
+        return render_template('recuperar.html', inicioS=inicioS,superAdmin=superAdmin, admin=admin)
     except Exception as e:
-        return render_template('recuperar.html', inicioS=inicioS)
+        return render_template('recuperar.html', inicioS=inicioS,superAdmin=superAdmin, admin=admin)
 
 
 @app.route('/habitacion', methods=['GET'])
 def habitacion():
-    return render_template('habitacion.html', inicioS=inicioS)
+    return render_template('habitacion.html', inicioS=inicioS,superAdmin=superAdmin, admin=admin)
 
 
 @app.route('/reserva', methods=['POST', 'GET'])
@@ -281,7 +281,7 @@ def reserva():
         'SELECT habitacion FROM habitaciones WHERE estado="Ocupado"').fetchall()
     if len(listaN) == len(listaA):
         flash("No hay habitaciones disponibles, intente más tarde")
-        return render_template("reserva.html", inicioS=inicioS, lista=lista)
+        return render_template("reserva.html", inicioS=inicioS, lista=lista,superAdmin=superAdmin, admin=admin)
 
     try:
         if request.method == 'POST':
@@ -332,10 +332,10 @@ def reserva():
                          contents=contenido)
             except Exception as e:
                 flash(e)
-            return render_template('reserva.html', inicioS=inicioS, exito=exito, lista=lista)
-        return render_template('reserva.html', inicioS=inicioS, lista=lista)
+            return render_template('reserva.html', inicioS=inicioS, exito=exito, lista=lista,superAdmin=superAdmin, admin=admin)
+        return render_template('reserva.html', inicioS=inicioS, lista=lista,superAdmin=superAdmin, admin=admin)
     except Exception as e:
-        return render_template('reserva.html', inicioS=inicioS, lista=lista)
+        return render_template('reserva.html', inicioS=inicioS, lista=lista,superAdmin=superAdmin, admin=admin)
 
 
 @app.route('/calificacion', methods=['GET', 'POST'])
@@ -373,11 +373,11 @@ def calificacion():
                 flash("Gracias por comentar su experiencia!")
             except Exception as e:
                 flash("Primero debes reservar una habitación")
-                return render_template('reserva.html', inicioS=inicioS, exito=exito, lista=lista)
-            return render_template('calificacion.html', inicioS=inicioS, exito=exito)
-        return render_template('calificacion.html', inicioS=inicioS)
+                return render_template('reserva.html', inicioS=inicioS, exito=exito, lista=lista,superAdmin=superAdmin, admin=admin)
+            return render_template('calificacion.html', inicioS=inicioS, exito=exito,superAdmin=superAdmin, admin=admin)
+        return render_template('calificacion.html', inicioS=inicioS,superAdmin=superAdmin, admin=admin)
     except Exception as e:
-        return render_template('calificacion.html', inicioS=inicioS)
+        return render_template('calificacion.html', inicioS=inicioS,superAdmin=superAdmin, admin=admin)
 
 
 @app.route('/comentarios', methods=['GET'])
@@ -412,10 +412,10 @@ def comentarios():
 
         db.commit()
         db.close()
-        return render_template('comentarios.html', inicioS=inicioS, nombre=nombre, fecha=fecha, comentarios=comentarios, tamano=tamano)
+        return render_template('comentarios.html', inicioS=inicioS, nombre=nombre, fecha=fecha, comentarios=comentarios, tamano=tamano,superAdmin=superAdmin, admin=admin)
     except Exception as e:
         flash(e)
-    return render_template('comentarios.html', inicioS=inicioS)
+    return render_template('comentarios.html', inicioS=inicioS,superAdmin=superAdmin, admin=admin)
 
 
 @app.route('/herramientas', methods=['GET'])
